@@ -20,6 +20,8 @@ minYlim = -0.1;
 maxYlim = 5;
 yyaxis left
 
+rng(0)
+
 %% Load in data from excel files and normalize them
 
 norm_signal = 1; %normalized signal is true
@@ -29,6 +31,9 @@ seednum = floor(rand*1000);  %get random seed
 [~,~,~,mrna_rnap,mrna_ser5,ser5_rnap] = load_normalization_variance_norm_cc(0);  %load normalization 21 pts for cross correlations
 %Load Autocorrelations with G0_intp normalization and no rezeroing 
 [mrna,ser5,rnap,~,~,~] = load_normalization_variance(1,'G0_intp','none',10);
+
+
+
 
 
 % 
@@ -145,6 +150,8 @@ set (gca ,'TickLength',[.01,.3],'LineWidth',1);
 title({'CTD'},'FontSize',fntsize,'FontWeight','bold')
 
 
+%%
+
 
 subplot(4,3,5)      %SER5 ACC figure
 fig1= gcf;
@@ -201,7 +208,7 @@ title({'Ser5ph'},'FontSize',fntsize,'FontWeight','bold')
 set (gca ,'FontSize',fntsize,'FontName', 'Arial','Xcolor',global_color,'Ycolor',global_color);
 set (gca ,'TickLength',[.01,.3],'LineWidth',1);
 
-
+%%
 subplot(4,3,8)   %mRNA ACC figure
 fig1= gcf;
 fig1.PaperUnits = 'centimeters';
@@ -259,7 +266,7 @@ set (gca ,'TickLength',[.01,.3],'LineWidth',1);
 
 saveas(gca,'Accs.epsc')  %save the autocorrelations
 
-
+%%
 lags2 = [-10:10]; %time vector for CCs
 
 subplot(4,3,3)
@@ -318,7 +325,7 @@ xlim([-10,10])
 ylim([-.1,1.3]) 
 set (gca ,'TickLength',[.01,.3],'LineWidth',1);
 
-
+%%
 subplot(4,3,6)
 fig1= gcf;
 fig1.PaperUnits = 'centimeters';
@@ -369,7 +376,7 @@ title({'mRNA-CTD'},'FontSize',fntsize,'FontWeight','bold')
 xlim([-10,10])
 ylim([-.1,1.3])
 
-
+%%
 
 subplot(4,3,9) %mrna_ser5 signal
 fig1= gcf;
@@ -465,7 +472,7 @@ time_var = 0;
 signal_update_rate = 0;
 
 W = @(x) W1*x + W0;
-
+rng(45)
 %Solve a singal trajectory 
 sol = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate);  
 
@@ -476,11 +483,18 @@ ts_ssa = sol(3,:)';
 [pol2_ssa,ser5_ssa,ts_ssa,~] = get_model_intesities(sol,eta_rnap,eta_ser5,eta_ts); %convert molecules to signal
 [pol2norm,ser5norm,tsnorm] = Normalize_simulated_intensities(.95,pol2_ssa,ser5_ssa,ts_ssa);
 
-
-subplot(4,3,[10,11,12])  %Plot this signal as the bottom plot
+X_SIZE = 13; Y_SIZE = 15;
+figure(35);clf;
 fig1= gcf;
 fig1.PaperUnits = 'centimeters';
-fig1.PaperPosition = [0, 0, xh, yh]; % x,y, width, height
+fig1.PaperPosition = [0, 0, X_SIZE, Y_SIZE]; % x,y, width, height
+global_color = 'k';
+
+cla;
+fig1.PaperUnits = 'centimeters';
+fig1.PaperPosition = [0, 0, xh, 1.1*yh]; % x,y, width, height
+
+
 avpol2 =movmean(pol2norm(end-200:end),3);
 avser5 = movmean(ser5norm(end-200:end),3);
 avts = movmean(tsnorm(end-200:end),3);
@@ -490,16 +504,186 @@ title('Representative trace','FontSize',fntsize,'FontWeight','bold')
 ylabel('Normalized intensity','FontSize',fntsize,'FontWeight','bold')
 xlabel('Time (min)','FontSize',fntsize,'FontWeight','bold')
 xlim([0,200])
+ylim([-.5,1.5])
 
 
 
-subplot(4,3,1)
-fig1= gcf;
-fig1.PaperUnits = 'centimeters';
-fig1.PaperPosition = [0, 0, xh, 3*yh]; % x,y, width, height
 
 
-saveas(gca, 'ccs_nohists.epsc')  %save the whole figure
+saveas(gca, 'trace.epsc')  %save the whole figure
+
+
+
+%% Acov taus
+T_array = [0:1:1000];
+
+mrna_bootstrapped_tau = [];
+ser5_bootstrapped_tau = [];
+rnap_bootstrapped_tau = [];
+
+mrna_sim_acov = zeros(400,32);
+ser5_sim_acov = zeros(400,32);
+rnap_sim_acov = zeros(400,32);
+
+k = 0;
+% while k < 400
+%     t = [0:1:199];
+% 
+% 
+%     simulated_pol2 = zeros(20,200);
+%     simulated_ser5 = zeros(20,200);
+%     simulated_mrna = zeros(20,200);
+% 
+%     for i = 1:20
+%         sol = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate);  
+%         [pol2_ssa,ser5_ssa,ts_ssa,~] = get_model_intesities(sol,0,0,0); %convert molecules to signal
+%         [pol2norm,ser5norm,tsnorm] = Normalize_simulated_intensities(.95,pol2_ssa,ser5_ssa,ts_ssa);
+%         simulated_pol2(i,:) = pol2norm(end-199:end);
+%         simulated_ser5(i,:) = ser5norm(end-199:end);
+%         simulated_mrna(i,:) = tsnorm(end-199:end);
+%     end
+% 
+%     [mrna_sim,ser5_sim,rnap_sim,~,~,~,G1_rnap_sim,G1_ser5_sim,G1_mrna_sim] = get_simulated_cc([0:1:199],simulated_pol2', simulated_ser5', simulated_mrna',0);
+% 
+% 
+%     decorr_mrna = t(mrna_sim.mn_ac < .01);
+%     if length(decorr_mrna) == 0
+%         continue
+%     end
+%     
+%     
+%     decorr_ser5 = t(ser5_sim.mn_ac < .01);
+% 
+%     if length(decorr_ser5) == 0
+%         continue
+%     end
+%     decorr_rnap = t(rnap_sim.mn_ac < .01);
+% 
+%     if length(decorr_rnap) == 0
+%         continue
+%     end
+%     
+%     k = k + 1
+%     mrna_bootstrapped_tau = [mrna_bootstrapped_tau, decorr_mrna(1)];
+%     ser5_bootstrapped_tau = [ser5_bootstrapped_tau, decorr_ser5(1)];
+%     rnap_bootstrapped_tau = [rnap_bootstrapped_tau, decorr_rnap(1)];
+%     
+%     mrna_sim_acov(k,:) = mrna_sim.mn_ac;
+%     ser5_sim_acov(k,:) = ser5_sim.mn_ac;
+%     rnap_sim_acov(k,:) = rnap_sim.mn_ac;
+% 
+% end
+
+load('rnap_sim_acov_nonoise.mat')
+load('ser5_sim_acov_nonoise.mat')
+load('mrna_sim_acov_nonoise.mat')
+
+
+%%
+
+thresh = .2;
+t = [0:1:199];
+mrna_bootstrapped_tau = [];
+ser5_bootstrapped_tau = [];
+rnap_bootstrapped_tau = [];
+for i = 1:400
+   tmpacov = t(mrna_sim_acov(i,:) < thresh);
+ 
+   mrna_bootstrapped_tau = [mrna_bootstrapped_tau, tmpacov(1)];
+
+   tmpacov = t(ser5_sim_acov(i,:) < thresh);
+   ser5_bootstrapped_tau = [ser5_bootstrapped_tau, tmpacov(1)];
+
+   tmpacov = t(rnap_sim_acov(i,:) < thresh);
+   rnap_bootstrapped_tau = [rnap_bootstrapped_tau, tmpacov(1)];
+ 
+end
+
+% figure(32)
+% histogram(mrna_bootstrapped_tau,'FaceColor','b')
+% hold on;
+% histogram(ser5_bootstrapped_tau,'FaceColor','g')
+% histogram(rnap_bootstrapped_tau,'FaceColor','r')
+
+
+
+%%
+figure(1)
+% subplot(4,3,2)
+% plot( [mean(rnap_bootstrapped_tau),mean(rnap_bootstrapped_tau)], [-1,6],'r', 'LineWidth',2)
+% x1 = mean(rnap_bootstrapped_tau)-std(rnap_bootstrapped_tau);
+% x2 = mean(rnap_bootstrapped_tau)+std(rnap_bootstrapped_tau);
+% fill( [x1,x2, x2,x1], [-1,-1,6,6],'r', 'FaceAlpha',.2,'LineStyle','none')
+% 
+% subplot(4,3,5)
+% plot( [mean(ser5_bootstrapped_tau),mean(ser5_bootstrapped_tau)], [-1,6],'g', 'LineWidth',2)
+% x1 = mean(ser5_bootstrapped_tau)-std(ser5_bootstrapped_tau);
+% x2 = mean(ser5_bootstrapped_tau)+std(ser5_bootstrapped_tau);
+% fill( [x1,x2, x2,x1], [-1,-1,6,6],'g', 'FaceAlpha',.2,'LineStyle','none')
+% 
+% subplot(4,3,8)
+% plot( [mean(mrna_bootstrapped_tau),mean(mrna_bootstrapped_tau)], [-1,6],'b', 'LineWidth',2)
+% 
+% 
+% x1 = mean(mrna_bootstrapped_tau)-std(mrna_bootstrapped_tau);
+% x2 = mean(mrna_bootstrapped_tau)+std(mrna_bootstrapped_tau);
+% fill( [x1,x2, x2,x1], [-1,-1,6,6],'b', 'FaceAlpha',.2,'LineStyle','none')
+% 
+% 
+
+
+
+
+
+load('rnap_sim_acov.mat')
+load('ser5_sim_acov.mat')
+load('mrna_sim_acov.mat')
+
+t = [0:1:199];
+mrna_bootstrapped_tau = [];
+ser5_bootstrapped_tau = [];
+rnap_bootstrapped_tau = [];
+for i = 1:400
+   tmpacov = t(mrna_sim_acov(i,:) < thresh);
+ 
+   mrna_bootstrapped_tau = [mrna_bootstrapped_tau, tmpacov(1)];
+
+   tmpacov = t(ser5_sim_acov(i,:) < thresh);
+   ser5_bootstrapped_tau = [ser5_bootstrapped_tau, tmpacov(1)];
+
+   tmpacov = t(rnap_sim_acov(i,:) < thresh);
+   rnap_bootstrapped_tau = [rnap_bootstrapped_tau, tmpacov(1)];
+ 
+end
+
+
+figure(1)
+subplot(4,3,2)
+plot( [mean(rnap_bootstrapped_tau),mean(rnap_bootstrapped_tau)], [-1,6],'r', 'LineWidth',2)
+x1 = mean(rnap_bootstrapped_tau)-std(rnap_bootstrapped_tau);
+x2 = mean(rnap_bootstrapped_tau)+std(rnap_bootstrapped_tau);
+fill( [x1,x2, x2,x1], [-1,-1,6,6],'r', 'FaceAlpha',.2,'LineStyle','--','edgecolor','r')
+
+subplot(4,3,5)
+plot( [mean(ser5_bootstrapped_tau),mean(ser5_bootstrapped_tau)], [-1,6],'g', 'LineWidth',2)
+x1 = mean(ser5_bootstrapped_tau)-std(ser5_bootstrapped_tau);
+x2 = mean(ser5_bootstrapped_tau)+std(ser5_bootstrapped_tau);
+fill( [x1,x2, x2,x1], [-1,-1,6,6],'g', 'FaceAlpha',.2,'LineStyle','--','edgecolor','g')
+
+subplot(4,3,8)
+plot( [mean(mrna_bootstrapped_tau),mean(mrna_bootstrapped_tau)], [-1,6],'b', 'LineWidth',2)
+
+
+x1 = mean(mrna_bootstrapped_tau)-std(mrna_bootstrapped_tau);
+x2 = mean(mrna_bootstrapped_tau)+std(mrna_bootstrapped_tau);
+fill( [x1,x2, x2,x1], [-1,-1,6,6],'b', 'FaceAlpha',.2,'LineStyle','--','edgecolor','b')
+
+
+
+
+saveas(gca, 'corrs_with_dwell.epsc')  %save the whole figure
+return
+
 %% Supplemental Figure
 % Plot the molecule signals with bursting highlighted and filled in 
 
@@ -593,6 +777,8 @@ mrna_data = reshape(mrna_I(1:20:end,:),1,200);
 
 %xh = 6.3;
 %yh = 6.4;
+
+%%
 fntsize = 18;
 
 
@@ -627,7 +813,7 @@ saveas(gca,'pol2_hist.epsc')
 set(gca,'YTickLabel',[],'XtickLabel',[])
 
 saveas(gca,'pol2_hist_nolabels.epsc')
-
+%%
 % 
 % title({'CTD Normalized Intensity'},'FontSize',fntsize,'FontWeight','bold','Color',global_color)
 % xlabel({'Intensity (Norm)'},'FontSize',fntsize,'FontWeight','bold')
@@ -665,6 +851,8 @@ set(gca,'linewidth',2)
 saveas(gca, 'ser5hist.epsc')
 set(gca,'YTickLabel',[],'XtickLabel',[])
 saveas(gca,'SER5_dist_nolabels.epsc') 
+
+%%
 
 % %legend('Model','Data')
 % title({'SER5 Normalized Intensity'},'FontSize',fntsize,'FontWeight','bold','Color',global_color)
@@ -872,6 +1060,127 @@ for i=1:7
 end
 
 saveas(gca,'par.epsc')
+%% new inhib figure
+
+inhibs = ones(size(parameters));
+n = n+1;
+
+inhibs(1) = .001; % inhibit kon
+pol2_traj = [];
+ser5_traj = [];
+ts_traj = [];
+
+pol2_traji = [];
+ser5_traji = [];
+ts_traji = [];
+
+for j = 1:40
+    sol = run_single_SSA_linda_inhib(x0,S,W,[0:1:1200],time_var,signal_update_rate,parameters,inhibs,1110);
+    
+        
+    [pol2_ssa,ser5_ssa,ts_ssa,~] = get_model_intesities(sol,eta_rnap,eta_ser5,eta_ts); %convert molecules to signal
+    
+%     pol2_ssa = sol(2,:)';
+%     ser5_ssa = sol(2,:)';
+%     ts_ssa = sol(3,:)';
+    
+    
+%  pol2_ssa = sol(2,:)' + sol(3,:)';
+% ser5_ssa = pol2_ssa;
+% ts_ssa = sol(3,:)';
+
+
+
+%pol2_ssa = add_shot_std(pol2_ssa,eta_rnap,30/200, std(pol2_ssa(1:1100)));
+%ser5_ssa = add_shot_std(ser5_ssa,eta_ser5,23/200, std(ser5_ssa(1:1100)));
+%ts_ssa = add_shot_std(ts_ssa,eta_ts,5/200, std(ts_ssa(1:1100))  );
+
+   % max_pol2 = mean(pol2_ssa(1110-2:1110));
+    %max_ser5 = mean(ser5_ssa(1110-2:1110));
+    %max_ts = mean(ts_ssa(1110-2:1110));
+    
+    %min_pol2 = mean(pol2_ssa(end-2:end));
+    %min_ser5 = mean(ser5_ssa(end-2:end));
+    %min_ts = mean(ts_ssa(end-2:end));
+    
+    
+    %pol2_ssa2 = (pol2_ssa - min_pol2)./(max_pol2-min_pol2);
+    %ser5_ssa2 = (ser5_ssa - min_ser5)./(max_ser5-min_ser5);
+    %ts_ssa2 = (ts_ssa - min_ts)./(max_ts-min_ts);
+    
+%     pol2_ssa2 = min_pol2+(max_pol2-min_pol2)*(pol2_ssa-min(pol2_ssa))/( max(pol2_ssa)-min(pol2_ssa));
+%     ser5_ssa2 = min_ser5+(max_ser5-min_ser5)*(ser5_ssa-min(ser5_ssa))/( max(ser5_ssa)-min(ser5_ssa));
+%     ts_ssa2 = min_ts+(max_ts-min_ts)*(ts_ssa-min(ts_ssa))/( max(ts_ssa)-min(ts_ssa));
+    top_pol2 = quantile(pol2_ssa(1:1*1100),.95); 
+    top_ser5 = quantile(ser5_ssa(1:1*1100),.95); 
+    top_ts = quantile(ts_ssa(1:1*1100),.95); 
+
+    pol2_ssa = pol2_ssa./top_pol2;
+    ser5_ssa = ser5_ssa./top_ser5;
+    ts_ssa = ts_ssa./top_ts;
+    
+     pol2_ssa = min(pol2_ssa,1.5);
+     ser5_ssa = min(ser5_ssa,1.5);
+     ts_ssa = min(ts_ssa,1.5);
+
+    pol2_traj = [pol2_traj; pol2_ssa'];
+    ser5_traj = [ser5_traj; ser5_ssa'];
+    ts_traj = [ts_traj; ts_ssa'];
+    
+
+
+end
+avpol2 = mean(pol2_traj,1);
+avser5 = mean(ser5_traj,1);
+avts = mean(ts_traj,1);
+
+bef_pol2 = mean((avpol2(1*1100:1110)));
+bef_ser5 = mean((avser5(1*1100:1110)));
+bef_ts = mean((avts(1*1100:1110)));
+avpol2 = avpol2./mean((avpol2(1*1100:1110)));
+avser5 = avser5./mean((avser5(1*1100:1110)));
+avts = avts./mean((avts(1*1100:1110)));
+per_len = 40;
+t = [-10:1:per_len-10];
+
+
+figure
+hold on;
+avpol2 = mean(pol2_traj,1);
+avser5 = mean(ser5_traj,1);
+avts = mean(ts_traj,1);
+
+bef_pol2 = mean((avpol2(1*1100-2:1110)));
+bef_ser5 = mean((avser5(1*1100-2:1110)));
+bef_ts = mean((avts(1*1100-2:1110)));
+
+after_pol2 = mean((avpol2(end-2:end))); 
+after_ser5 = mean((avser5(end-2:end))); 
+after_ts = mean((avts(end-2:end))); 
+
+avpol2 = (avpol2- after_pol2)./(bef_pol2-after_pol2);
+avser5 = (avser5- after_ser5)./(bef_ser5-after_ser5);
+avts = (avts- after_ts)./(bef_ts-after_ts);
+%plot(t, avpol2(1*1100:1*1100+1*per_len),'r','LineWidth',1);  plot(t, avser5(1*1100:1*1100+1*per_len),'g','LineWidth',1); plot(t, avts(1*1100:1*1100+1*per_len),'b','LineWidth',1)
+
+plot(t, avpol2(1*1100:1*1100+1*per_len),'Color','r','LineWidth',1);  plot(t, avser5(1*1100:1*1100+1*per_len),'Color','g','LineWidth',1); plot(t, avts(1*1100:1*1100+1*per_len),'b','LineWidth',1)
+plot([0,0],[-.1,1.1],'k--','LineWidth',2);
+
+%%
+p2_x = pol2_traj(:,1107:1140);
+s5_x =  ser5_traj(:,1107:1140);
+m_x = mean(ts_traj(:,1107:1140),1);
+xx = 0:1:33;
+modelFun = @(p,x) atan(x.*p(1)./p(2)./(p(1)^2-x.^2));
+startingVals = [1 1]; % try with any other starting values. 
+coefEsts = nlinfit(xx,m_x, modelFun, startingVals);
+
+figure
+plot(m_x);
+hold on;
+plot(modelFun(coefEsts,xx));
+
+
 %% Inhibs 
 n = 0;
 figure(9)
@@ -943,9 +1252,9 @@ ts_ssa = add_shot_std(ts_ssa,eta_ts,5/200, std(ts_ssa(1:1100))  );
     ser5_ssa = ser5_ssa./top_ser5;
     ts_ssa = ts_ssa./top_ts;
     
-    pol2_ssa = min(pol2_ssa,1.5);
-    ser5_ssa = min(ser5_ssa,1.5);
-    ts_ssa = min(ts_ssa,1.5);
+     pol2_ssa = min(pol2_ssa,1.5);
+     ser5_ssa = min(ser5_ssa,1.5);
+     ts_ssa = min(ts_ssa,1.5);
 
     pol2_traj = [pol2_traj; pol2_ssa'];
     ser5_traj = [ser5_traj; ser5_ssa'];
@@ -1001,7 +1310,7 @@ end
 saveas(gca,'perturb.epsc')
 
 
-
+return 
 
 %%
 n = 0;

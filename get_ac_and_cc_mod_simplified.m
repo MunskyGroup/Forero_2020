@@ -14,6 +14,11 @@ eta_rnap = parameters(8);
 eta_ser5 = parameters(9);
 eta_ts = parameters(10);
 
+if frac > 1
+    frac = 1;
+    
+end
+
 %%
 
 Nstates = 3;

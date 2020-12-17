@@ -32,7 +32,7 @@ cv13 = 1/parameters(12)*sigred(3,1);
 cv23 = 1/parameters(13)*sigred(6,1);
 sig_d = [9.7339e-01   3.4716e-01   5.0248e-01];
 sig_d_sem = [1.4262e-01   8.6887e-02   1.1456e-01];
-%     err(13) = sum(abs(log([cv12,cv13,cv23]./sig_d)));
+%err(13) = sum(abs(log([cv12,cv13,cv23]./sig_d)));
 err(13) = 0*sum(([cv12,cv13,cv23]-sig_d).^2./sig_d_sem.^2)/2;
 
 end

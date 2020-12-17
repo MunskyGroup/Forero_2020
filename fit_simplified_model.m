@@ -1,8 +1,7 @@
 clear all
-close all
-clc
-addpath ../Data_files/
-addpath ../
+%close all
+
+
 %%
 [mrna,ser5,rnap,mrna_rnap,mrna_ser5,ser5_rnap] = load_normalization_variance_gui(1,'G0_intp');
 
@@ -21,47 +20,50 @@ mrna_ser5.mn_cc = mrna_ser5.mn_cc/mrna_ser5.mn_cc(11);
 
 ser5_rnap.sem_cc = ser5_rnap.sem_cc/ser5_rnap.mn_cc(11);
 ser5_rnap.mn_cc = ser5_rnap.mn_cc/ser5_rnap.mn_cc(11);
+
+mrna.mn_ac
 %%
 load best_simple_pars
-% parameters = ones(1,13);
+parameters
+parameters = ones(1,13);
 parameters(2) = 1;
 parameters(7) = 1;
 par_fixed = parameters;
-par_changed = [1,3:6,8:13];
+par_changed = [1,3:13];
 par_opt = log10(par_fixed(par_changed));
 get_err = @(pars)sum(get_log_l_simplified(10.^pars,mrna,ser5,rnap,mrna_rnap,mrna_ser5,ser5_rnap,par_fixed,par_changed));
 min_err=inf;
 %%
 for i=1:20
-    %     try
-    %         parpool
-    %     catch
-    %     end
-    %     x = par_opt;
-    %     Constrs.LB=-5*ones(size(x));
-    %     Constrs.UB=5*ones(size(x));
-    %     % Constrs.UB(2) = 0;
-    %
-    %     pctRunOnAll warning('off', 'all')
-    %
-    %     Mut_Fun = @(parents,options,nvars,FitnessFcn,state,thisScore,thisPopulation)Mutation(parents,options,nvars,FitnessFcn,state,thisScore,thisPopulation,Constrs);
-    %     Npop = 200;
-    %     gaopt = gaoptimset('Display','final','useparallel',1,...
-    %         'MutationFcn',Mut_Fun,...
-    %         'PopulationSize',Npop,...
-    %         'EliteCount',1,'Generations',200,'CrossoverFraction',0);  %add output function
-    %     gaopt.InitialPopulation = [repmat(x,Npop,1)+randn(Npop,length(x))];
-    %
-    %     [x,~,~,~,~,~] = ga(get_err,length(x),gaopt); % Run the G.A.
-    %     par_opt = x;
-    %
+        try
+            parpool
+        catch
+        end
+        x = par_opt;
+        Constrs.LB=-5*ones(size(x));
+        Constrs.UB=5*ones(size(x));
+        % Constrs.UB(2) = 0;
+    
+        pctRunOnAll warning('off', 'all')
+    
+        Mut_Fun = @(parents,options,nvars,FitnessFcn,state,thisScore,thisPopulation)Mutation(parents,options,nvars,FitnessFcn,state,thisScore,thisPopulation,Constrs);
+        Npop = 200;
+        gaopt = gaoptimset('Display','final','useparallel',1,...
+            'MutationFcn',Mut_Fun,...
+            'PopulationSize',Npop,...
+            'EliteCount',1,'Generations',200,'CrossoverFraction',0);  %add output function
+        gaopt.InitialPopulation = [repmat(x,Npop,1)+randn(Npop,length(x))];
+    
+        [x,~,~,~,~,~] = ga(get_err,length(x),gaopt); % Run the G.A.
+        par_opt = x;
+    
     options = optimset('display','iter','MaxIter',5000);
     par_opt = fminsearch(get_err,par_opt,options);
     err = get_log_l_simplified(10.^par_opt,mrna,ser5,rnap,mrna_rnap,mrna_ser5,ser5_rnap,par_fixed,par_changed);
     if sum(err)<min_err
         min_err=sum(err)
         parameters(par_changed) = 10.^par_opt;
-        save best_simple_pars parameters
+        save best_simple_pars_checkfrac parameters
         
         make_plots(parameters,mrna,ser5,rnap,mrna_rnap,mrna_ser5,ser5_rnap,sig_dat,sig_dat_sem,err,[0 0 0])
     end

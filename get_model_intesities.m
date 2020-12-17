@@ -7,8 +7,11 @@ ser5_ssa = pol2_ssa;
 ts_ssa = sol(3,:)';
 
 pol2_ssa_w_shot = add_shot(pol2_ssa,eta_rnap,30/200);
+%pol2_ssa_w_shot = add_shot(pol2_ssa,eta_rnap,1/200);
 ser5_ssa_w_shot = add_shot(ser5_ssa,eta_ser5,23/200);
 ts_ssa_w_shot = add_shot(ts_ssa,eta_ts,5/200);
+%ser5_ssa_w_shot = add_shot(ser5_ssa,eta_ser5,1/200);
+%ts_ssa_w_shot = add_shot(ts_ssa,eta_ts,1/200);
 % The third inputs are the fraction of data points that were assigned as
 % negative values.
 
