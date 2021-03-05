@@ -1,4 +1,9 @@
 function cm_data=viridis(m)
+
+%%
+
+% Port of Viridis from matplotlib to matlab for a colormap function.
+
 cm = [[ 0.26700401,  0.00487433,  0.32941519],
        [ 0.26851048,  0.00960483,  0.33542652],
        [ 0.26994384,  0.01462494,  0.34137895],

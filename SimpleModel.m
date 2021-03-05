@@ -148,7 +148,6 @@ classdef SimpleModel
 
   
         
-        
         W1after = [[-self.kon*inhibs(1)         0         0];
             [self.koff*inhibs(2)         0         0];
             [self.kin*inhibs(5)         0         0];
@@ -180,17 +179,18 @@ classdef SimpleModel
              %P =  A^-1*(-eye(3) + expm(A*tode(j)))*b - x0;
              %P = A^-1*(-eye(3) + expm(A*tode(j)))*b ;
             xx = zeros(self.Nstates,1);
-            xx(1) = self.kon;
+            xx(1) = self.kon*inhibs(1)
             xx(2) = 0;
             xx(3) = 0;
             P= Anew^-1*(-eye(3) + expm(Anew*tode(j)))*xx + expm(Anew*tode(j))*[0;self.EX(2);self.EX(3)];
             on = [on, P(1)];
-            ctd_ode = [ctd_ode,P(2)];
+            ctd_ode = [ctd_ode,P(2) + P(3)];
             ts_ode = [ts_ode,P(3)];
            
         end
         
         ana_means = [on; ctd_ode; ts_ode];
+        
             
      end
      

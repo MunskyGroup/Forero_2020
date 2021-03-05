@@ -72,7 +72,7 @@ classdef RNAP_SER5_SplitModel
      end
      
      function b = get.b(self)
-         b = [self.kon; 0;0;];
+         b = [self.kon; 0;0;0;];
      end   
      
      function A = get.A(self)
@@ -149,15 +149,15 @@ classdef RNAP_SER5_SplitModel
 
      end
      
-     function [ana_means, ctd_ode, ts_ode] = ana_inhibs(self, tode, inhibs)
+     function [ana_means, ctd_ode, ser5_ode,ts_ode ] = ana_inhibs(self, tode, inhibs)
 
 
 
         
         
-        W1after = [[-self.kon*inhibs(1)         0         0];
-            [self.koff*inhibs(2)         0         0];
-            [self.kin*inhibs(5)         0         0];
+        W1after = [[-self.kon*inhibs(1)         0         0 0];
+            [self.koff*inhibs(2)         0         0 0];
+            [self.kin*inhibs(5)         0         0 0];
              [    0    self.k_ctd_to_ser5*inhibs(13)    0   0];
              [    0        0  self.kout*inhibs(6)       0  ];
              [    0        0  self.kesc*self.frac*inhibs(3)*inhibs(7)      0  ];
@@ -172,7 +172,7 @@ classdef RNAP_SER5_SplitModel
         on = [];
         ctd_ode = [];
         ts_ode = [];
-            
+        ser5_ode = [];
             
         for j = 1:length(tode)
 
@@ -188,17 +188,18 @@ classdef RNAP_SER5_SplitModel
              %P =  A^-1*(-eye(3) + expm(A*tode(j)))*b - x0;
              %P = A^-1*(-eye(3) + expm(A*tode(j)))*b ;
             xx = zeros(self.Nstates,1);
-            xx(1) = self.kon;
+            xx(1) = self.kon*inhibs(1);
             xx(2) = 0;
             xx(3) = 0;
             P= Anew^-1*(-eye(self.Nstates) + expm(Anew*tode(j)))*xx + expm(Anew*tode(j))*[0;self.EX(2);self.EX(3); self.EX(4)];
             on = [on, P(1)];
             ctd_ode = [ctd_ode,P(2)+P(3) + P(4)];
+            ser5_ode = [ser5_ode, P(3) + P(4)];
             ts_ode = [ts_ode,P(4)];
            
         end
         
-        ana_means = [on; ctd_ode; ts_ode];
+        ana_means = [on; ctd_ode; ser5_ode; ts_ode];
             
      end
      
@@ -212,16 +213,16 @@ classdef RNAP_SER5_SplitModel
 
         W = @(x) self.W1*x + self.W0;
         
-        
-        W1after = [[-self.kon*inhibs(1)         0         0];
-            [self.koff*inhibs(2)         0         0];
-            [self.kin*inhibs(5)         0         0];
+ 
+        W1after = [[-self.kon*inhibs(1)         0         0,0];
+            [self.koff*inhibs(2)         0         0,0];
+            [self.kin*inhibs(5)         0         0,0];
              [    0    self.k_ctd_to_ser5*inhibs(13)    0   0];
              [    0        0  self.kout*inhibs(6)       0  ];
              [    0        0  self.kesc*self.frac*inhibs(3)*inhibs(7)      0  ];
              [    0         0       0   self.kproc*inhibs(4) ];];  
          
-         W0after = [[self.kon*inhibs(1); 0; 0; 0; 0; 0;]];
+         W0after = [[self.kon*inhibs(1); 0; 0; 0; 0; 0;0;]];
          
          Wafter = @(x) W1after*x + W0after;
          

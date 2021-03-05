@@ -42,12 +42,31 @@ classdef mRNASoloModel
      b
      W1
      W0
-    
+     stats
      
  end
  
  methods
-    
+     
+      function stats = get.stats(self)
+            p_esc = self.kesc/(self.kesc+ self.kout);
+            p2_arrival = self.kin/1000  *  self.kon;
+            m_cluster = (p2_arrival / (self.kesc + self.kout));
+            av_mrna_solo = m_cluster*self.k_release_mrna;
+            
+            av_mrna = m_cluster*(self.kesc/(self.kproc + self.k_proc_mRNAsolo)); 
+            
+    stats = {'POLII arrival rate',p2_arrival, 'min^-1';
+                 'Prob POLII escape', p_esc, '---';
+                 'Average mRNA',av_mrna, 'molecules';
+                 'Average time solo CTD',1/(self.kesc + self.kout), 'min';
+                 'Average POLII',av_mrna+m_cluster, 'molecules';
+                 'Average mRNA production',m_cluster*self.kesc,'molecules/min';
+                 'mRNA completion time', 1/self.kproc,'min';
+                 'Average solo CTD',m_cluster,'molecules';
+                 'Average mRNA solo', av_mrna_solo,'molecules';
+                 };
+     end   
      
      function c = get.c(self)
         c = zeros(3,self.Nstates);
@@ -221,11 +240,11 @@ classdef mRNASoloModel
              %P =  A^-1*(-eye(3) + expm(A*tode(j)))*b - x0;
              %P = A^-1*(-eye(3) + expm(A*tode(j)))*b ;
             xx = zeros(self.Nstates,1);
-            xx(1) = self.kon;
+            xx(1) = self.kon*inhibs(1);
 
             P= Anew^-1*(-eye(self.Nstates) + expm(Anew*tode(j)))*xx + expm(Anew*tode(j))*[0;self.EX(2);self.EX(3); self.EX(4)];
             on = [on, P(1)];
-            ctd_ode = [ctd_ode,P(2)];
+            ctd_ode = [ctd_ode,P(2)+P(3)];
             ts_ode = [ts_ode,P(3) + P(4)];
             
            
