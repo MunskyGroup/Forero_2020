@@ -67,7 +67,9 @@ par_changed = [1:5];
 mh_pars = [];   %load in the methaste sampling data for plots
 mh_vals = [];
 ikeep = 1;
-i=1;         
+i=1; 
+
+cd Model_fits\simple_MH_results\3.24.2020\
 while ikeep==1
     try
         fn = ['met_hast_pars_2x_',num2str(i),'.mat'];
@@ -80,6 +82,7 @@ while ikeep==1
     end    
 end
 
+cd ..\..\..
 
 par_fixed = parameters;
 par_changed = [1,3:6];
@@ -266,7 +269,7 @@ title({'mRNA'},'FontSize',fntsize,'FontWeight','bold')
 set (gca ,'FontSize',fntsize,'FontName', 'Arial','Xcolor',global_color,'Ycolor',global_color);
 set (gca ,'TickLength',[.01,.3],'LineWidth',1);
 
-saveas(gca,'Accs.epsc')  %save the autocorrelations
+saveas(gca,'./Figures/Accs.epsc')  %save the autocorrelations
 
 %%
 lags2 = [-10:10]; %time vector for CCs
@@ -431,7 +434,7 @@ title({'mRNA-Ser5ph'},'FontSize',fntsize,'FontWeight','bold')
 xlim([-10,10])
 ylim([-.1,1.3])
 
-saveas(gca,'ccs_nodist.epsc')
+saveas(gca,'./Figures/ccs_nodist.epsc')
 
 %% SSA trajectory for bottom of figure 3
 kon = parameters(1);
@@ -512,7 +515,7 @@ ylim([-.5,1.5])
 
 
 
-saveas(gca, 'trace.epsc')  %save the whole figure
+saveas(gca, './Figures/trace.epsc')  %save the whole figure
 
 
 
@@ -575,11 +578,11 @@ k = 0;
 %     rnap_sim_acov(k,:) = rnap_sim.mn_ac;
 % 
 % end
-
+cd taus
 load('rnap_sim_acov_nonoise.mat')
 load('ser5_sim_acov_nonoise.mat')
 load('mrna_sim_acov_nonoise.mat')
-
+cd ..
 
 %%
 
@@ -636,10 +639,11 @@ figure(1)
 
 
 
-
+cd taus
 load('rnap_sim_acov.mat')
 load('ser5_sim_acov.mat')
 load('mrna_sim_acov.mat')
+cd ..
 
 t = [0:1:199];
 mrna_bootstrapped_tau = [];
@@ -683,8 +687,8 @@ fill( [x1,x2, x2,x1], [-1,-1,6,6],'b', 'FaceAlpha',.2,'LineStyle','--','edgecolo
 
 
 
-saveas(gca, 'corrs_with_dwell.epsc')  %save the whole figure
-return
+saveas(gca, './Figures/corrs_with_dwell.epsc')  %save the whole figure
+
 
 %% Supplemental Figure
 % Plot the molecule signals with bursting highlighted and filled in 
@@ -719,7 +723,7 @@ ylabel({'Simulated molecule counts'},'FontSize',fntsize,'FontWeight','bold')
 a = legend({'Burst','CTD','mRNA'},'FontSize',fntsize,'FontWeight','bold');
 %set (gca ,'TickLength',[.01,.3],'LineWidth',2);
 set(a, 'Box', 'off');
-saveas(gca,'Burst_traj.epsc')
+saveas(gca,'./Figures/Burst_traj.epsc')
 
 
 
@@ -811,10 +815,10 @@ set(a,'TextColor',global_color);
 ylim([0,.15])
 xlim([-1.3,1.5])
 set(gca,'linewidth',2)
-saveas(gca,'pol2_hist.epsc')
+saveas(gca,'./Figures/pol2_hist.epsc')
 set(gca,'YTickLabel',[],'XtickLabel',[])
 
-saveas(gca,'pol2_hist_nolabels.epsc')
+saveas(gca,'./Figures/pol2_hist_nolabels.epsc')
 %%
 % 
 % title({'CTD Normalized Intensity'},'FontSize',fntsize,'FontWeight','bold','Color',global_color)
@@ -850,7 +854,7 @@ xlim([-1.3,1.5])
 set (gca ,'FontSize',fntsize,'FontName', 'Arial','Xcolor',global_color,'Ycolor',global_color);
 set(a,'TextColor',global_color);
 set(gca,'linewidth',2)
-saveas(gca, 'ser5hist.epsc')
+saveas(gca, './Figures/ser5hist.epsc')
 set(gca,'YTickLabel',[],'XtickLabel',[])
 saveas(gca,'SER5_dist_nolabels.epsc') 
 
@@ -891,7 +895,7 @@ x4 = histogram(mrna_hist ,n,'Normalization','probability','FaceColor','none','Fa
 set (gca ,'FontSize',fntsize,'FontName', 'Arial','Xcolor',global_color,'Ycolor',global_color);
 set(a,'TextColor',global_color);
 set(gca,'linewidth',2)
-saveas(gca, 'tshist_labels.epsc') 
+saveas(gca, './Figures/tshist_labels.epsc') 
 set(gca,'YTickLabel',[],'XtickLabel',[])
 saveas(gca, 'tshist_nolabels.epsc') 
 
@@ -910,6 +914,7 @@ saveas(gca, 'tshist_nolabels.epsc')
 addpath ../Data_files/
 addpath ../
 
+cd ./Model_fits/simple_MH_results/3.24.2020/
 parnames = {'kon','kesc','kproc','beta','kout'};
 parnames = {'beta','omega','k out','k esc','k complete'};
 
@@ -930,7 +935,7 @@ while ikeep==1
         ikeep=0;
     end    
 end
-
+cd ../../..
 Np = 5;
 
 mh_pars = mh_pars(:,[4,1,5,2,3]);
@@ -999,7 +1004,7 @@ for i=1:Np
     
 end
 
-saveas(gca,'sensitivity.epsc')
+saveas(gca,'./Figures/sensitivity.epsc')
 
 
 kon = mh_pars(:,1);
@@ -1061,7 +1066,7 @@ for i=1:7
     
 end
 
-saveas(gca,'par.epsc')
+saveas(gca,'./Figures/par.epsc')
 %% new inhib figure
 
 inhibs = ones(size(parameters));
@@ -1309,10 +1314,10 @@ end
 
 
 end
-saveas(gca,'perturb.epsc')
+saveas(gca,'./Figures/perturb.epsc')
 
 
-return 
+
 
 %%
 n = 0;
@@ -1540,7 +1545,7 @@ end
 
 
 end
-saveas(gca,'perturbs_sep1.epsc')
+saveas(gca,'./Figures/perturbs_sep1.epsc')
 
 
 
@@ -1621,7 +1626,7 @@ xlabel({'Location' },'FontSize',fntsize,'FontWeight','bold')
 ylabel({'Simulated molecule counts'},'FontSize',fntsize,'FontWeight','bold')
 ylim([0,35])
 
-saveas(gca,'ss.epsc')
+saveas(gca,'./Figures/ss.epsc')
 
 
 %end
@@ -1683,7 +1688,7 @@ title(strcat('Average On (Total CTD > 50) nsim = ',string(n)),'FontSize',fntsize
 xlabel({'Location' },'FontSize',fntsize,'FontWeight','bold')
 ylabel({'Simulated molecule counts'},'FontSize',fntsize,'FontWeight','bold')
 ylim([0,35])
-saveas(gca,'bursting_chip.epsc')
+saveas(gca,'./Figures/bursting_chip.epsc')
 
 %%
 
@@ -1743,7 +1748,7 @@ title(strcat('Average Off (Unescaped CTD < 5) nsim = ',string(n)),'FontSize',fnt
 xlabel({'Location' },'FontSize',fntsize,'FontWeight','bold')
 ylabel({'Simulated molecule counts'},'FontSize',fntsize,'FontWeight','bold')
 ylim([0,35])
-saveas(gca,'off_chip.epsc')
+saveas(gca,'./Figures/off_chip.epsc')
 
 %%
 npts_pol2 = [];
@@ -1802,7 +1807,7 @@ title(strcat('Average Transient (5 < Unescaped CTD < 15) nsim = ',string(n)),'Fo
 xlabel({'Location' },'FontSize',fntsize,'FontWeight','bold')
 ylabel({'Simulated molecule counts'},'FontSize',fntsize,'FontWeight','bold')
 ylim([0,35])
-saveas(gca,'trans_chip.epsc')
+saveas(gca,'./Figures/trans_chip.epsc')
 
 
 %% Calculate analytical parameters
@@ -2272,7 +2277,7 @@ end
 
 
 end
-saveas(gca,'perturbs_sep2.epsc')
+saveas(gca,'./Figures/perturbs_sep2.epsc')
 
 
 %%
@@ -2446,7 +2451,7 @@ set (gca ,'FontSize',fntsize,'FontName', 'Arial');
 
 %set(gca,'Color','k')
 %set(gcf,'Color','k')
-saveas(gca,'CTD_dist.epsc') 
+saveas(gca,'./Figures/CTD_dist.epsc') 
 
 subplot(4,3,6)
 fig1= gcf;
@@ -2470,7 +2475,7 @@ ylabel({'Probability'},'FontSize',fntsize,'FontWeight','bold')
 ylim([0,.13])
 set (gca ,'TickLength',[.01,.3],'LineWidth',1);
 set (gca ,'FontSize',fntsize,'FontName', 'Arial');
-saveas(gca,'SER5_dist.epsc') 
+saveas(gca,'./Figures/SER5_dist.epsc') 
 %set(gca,'Color','k')
 %set(gcf,'Color','k')
 
@@ -2499,7 +2504,7 @@ set (gca ,'TickLength',[.01,.3],'LineWidth',1);
 set (gca ,'FontSize',fntsize,'FontName', 'Arial');
 %set(gca,'Color','k')
 %set(gcf,'Color','k')
-saveas(gca,'TS_dist.epsc')   
+saveas(gca,'./Figures/TS_dist.epsc')   
 
 
 subplot(4,3,[10,11,12])
@@ -2516,7 +2521,7 @@ ylabel('Normalized intensity','FontSize',fntsize,'FontWeight','bold')
 xlabel('Time (min)','FontSize',fntsize,'FontWeight','bold')
 xlim([0,200])
 
-saveas(gca,'ccs.epsc')
+saveas(gca,'./Figures/ccs.epsc')
 
 
 %%
@@ -2563,7 +2568,7 @@ xlabel('kBP')
 axis([0 ,5.3 ,0,1])
 set (gca ,'FontSize',fntsize-4,'FontName', 'Arial');
 
-saveas(gca,'simChip.epsc')      
+saveas(gca,'./Figures/simChip.epsc')      
 
 
 
