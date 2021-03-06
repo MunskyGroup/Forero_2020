@@ -21,6 +21,7 @@ maxYlim = 5;
 yyaxis left
 addpath('./Data_files')
 addpath('./Model_files')
+addpath('./Parameter_files')
 rng(0)
 
 %% Load in data from excel files and normalize them
