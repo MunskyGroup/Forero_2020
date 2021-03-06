@@ -1970,6 +1970,8 @@ disp('sim av rnap in cluster, sim av rnap in cluster')
 addpath ../Data_files/
 addpath ../
 
+cd ./Model_fits/simple_MH_results/3.24.2020/
+
 parnames = {'kon','kesc','kproc','beta','kout'};
 parnames = {'beta','omega','k out','k esc','k complete'};
 
@@ -1991,6 +1993,7 @@ while ikeep==1
     end    
 end
 
+cd ../../..
 Np = 5;
 
 mh_pars = mh_pars(:,[4,1,5,2,3]);
