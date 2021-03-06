@@ -19,7 +19,8 @@ norm_intensity = 0;
 minYlim = -0.1;
 maxYlim = 5;
 yyaxis left
-
+addpath('./Data_files')
+addpath('./Model_files')
 rng(0)
 
 %% Load in data from excel files and normalize them
