@@ -1,4 +1,4 @@
-function [X_array] = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate)
+function [X_array] = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate)
 % Start the simulation.
 t = 0;   % initial time of simulation.
 x = x0;
@@ -6,7 +6,7 @@ iprint = 1;  % The next time at which to record results.
 Nsp = size(S,1);  %Number of species.
 Nt = length(T_array);
 X_array = zeros(Nsp,Nt);
-
+recorded_pol2_arrivals = 0;
 if time_var
         S = [zeros(Nsp,1),S];
         props(1) = signal_update_rate;
@@ -47,6 +47,16 @@ while t<max(T_array)
     % At this point j is the chosen reaction.
     
     %% Update state
+    
+    
+    if j == 3 
+        recorded_pol2_arrivals = recorded_pol2_arrivals + 1;
+    end
     x = x + S(:,j);
+    
+    
+
 end
 
+
+end

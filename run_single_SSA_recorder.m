@@ -1,4 +1,4 @@
-function [X_array,recorded_pol2_arrivals,aborted,escaped,escaped_times] = run_single_SSA_linda_recorder(x0,S,W,T_array,time_var,signal_update_rate)
+function [X_array,recorded_pol2_arrivals,aborted,escaped,escaped_times] = run_single_SSA_recorder(x0,S,W,T_array,time_var,signal_update_rate)
 % Start the simulation.
 t = 0;   % initial time of simulation.
 x = x0;

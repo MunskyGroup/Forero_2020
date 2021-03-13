@@ -163,7 +163,7 @@ classdef mRNASoloModel
         signal_update_rate = 0;
 
         W = @(x) self.W1*x + self.W0;
-        sol = run_single_SSA_linda(x0,self.S,W,time,time_var,signal_update_rate);  
+        sol = run_single_SSA(x0,self.S,W,time,time_var,signal_update_rate);  
 
        
         [pol2_ssa_w_shot,ser5_ssa_w_shot,ts_ssa_w_shot,ts_ssa,pol2_ssa,ser5_ssa] = self.convert_ssa(sol);

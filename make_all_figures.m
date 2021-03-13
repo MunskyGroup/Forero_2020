@@ -479,7 +479,7 @@ signal_update_rate = 0;
 W = @(x) W1*x + W0;
 rng(45)
 %Solve a singal trajectory 
-sol = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate);  
+sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);  
 
 pol2_ssa = sol(2,:)';
 ser5_ssa = sol(2,:)';
@@ -540,7 +540,7 @@ k = 0;
 %     simulated_mrna = zeros(20,200);
 % 
 %     for i = 1:20
-%         sol = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate);  
+%         sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);  
 %         [pol2_ssa,ser5_ssa,ts_ssa,~] = get_model_intesities(sol,0,0,0); %convert molecules to signal
 %         [pol2norm,ser5norm,tsnorm] = Normalize_simulated_intensities(.95,pol2_ssa,ser5_ssa,ts_ssa);
 %         simulated_pol2(i,:) = pol2norm(end-199:end);
@@ -699,7 +699,7 @@ fig1= gcf;
 fig1.PaperUnits = 'centimeters';
 fig1.PaperPosition = [0, 0, xh, yh]; % x,y, width, height
 T_array = [0:.1:200];
-sol = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate);
+sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
 
 pol2_ssa = (sol(2,:) + sol(3,:))';
 ser5_ssa = (sol(2,:)+ sol(3,:))';
@@ -748,7 +748,7 @@ rnap_c = [];
 ser5_c = [];
 mrna_c = [];
 for i = 1:1000
-    sol = run_single_SSA_linda(x0,S,W,[0:1:2000],time_var,signal_update_rate);
+    sol = run_single_SSA(x0,S,W,[0:1:2000],time_var,signal_update_rate);
     pol2_ssa = sol(2,:)';
     ser5_ssa = sol(2,:)';
     ts_ssa = sol(3,:)';
@@ -1082,7 +1082,7 @@ ser5_traji = [];
 ts_traji = [];
 
 for j = 1:40
-    sol = run_single_SSA_linda_inhib(x0,S,W,[0:1:1200],time_var,signal_update_rate,parameters,inhibs,1110);
+    sol = run_single_SSA_inhib(x0,S,W,[0:1:1200],time_var,signal_update_rate,parameters,inhibs,1110);
     
         
     [pol2_ssa,ser5_ssa,ts_ssa,~] = get_model_intesities(sol,eta_rnap,eta_ser5,eta_ts); %convert molecules to signal
@@ -1230,7 +1230,7 @@ ser5_traji = [];
 ts_traji = [];
 
 for j = 1:200
-    sol = run_single_SSA_linda_inhib(x0,S,W,[0:1:1200],time_var,signal_update_rate,parameters,inhibs,1110);
+    sol = run_single_SSA_inhib(x0,S,W,[0:1:1200],time_var,signal_update_rate,parameters,inhibs,1110);
     
         
     
@@ -1362,7 +1362,7 @@ ts_traji = [];
 n = 0;
 while n < 7
     
-    sol = run_single_SSA_linda_inhib(x0,S,W,[0:1:1200],time_var,signal_update_rate,parameters,inhibs,1110);
+    sol = run_single_SSA_inhib(x0,S,W,[0:1:1200],time_var,signal_update_rate,parameters,inhibs,1110);
     sol(2,1110);
     if sol(3,1110) > means(3)
         n = n+1;
@@ -1580,7 +1580,7 @@ pol2_transient = [];
 
 for j = 1:3
     T_array = [0:1:40000];
-    sol = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate);
+    sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
 
     pol2_ssa = sol(2,:)';
     ser5_ssa = sol(2,:)+ sol(3,:)';
@@ -1647,7 +1647,7 @@ fig1.PaperPosition = [0, 0, 1*xh, yh]; % x,y, width, height
 while length(npts_ts) < 500
     length(npts_ts) 
     T_array = [0:1:40000];
-    sol = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate);
+    sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
 
     pol2_ssa = sol(2,:)';
     ser5_ssa = sol(2,:)+ sol(3,:)';
@@ -1707,7 +1707,7 @@ fig1.PaperPosition = [0, 0, 1*xh, yh]; % x,y, width, height
     
 for j = 1:3
     T_array = [0:1:40000];
-    sol = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate);
+    sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
 
     pol2_ssa = sol(2,:)';
     ser5_ssa = sol(2,:)+ sol(3,:)';
@@ -1767,7 +1767,7 @@ fig1.PaperPosition = [0, 0, 1*xh, yh]; % x,y, width, height
     
 for j = 1:3
     T_array = [0:1:40000];
-    sol = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate);
+    sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
 
     pol2_ssa = sol(2,:)';
     ser5_ssa = sol(2,:)+ sol(3,:)';
@@ -1855,7 +1855,7 @@ nbursts = [];
 burst_sizes = [];
 for j = 1:5
     T_array = [0:1:40000];
-    [sol,pol2_arrivals,aborted,escaped,p2_arrive_times] = run_single_SSA_linda_recorder(x0,S,W,T_array,0,0);
+    [sol,pol2_arrivals,aborted,escaped,p2_arrive_times] = run_single_SSA_recorder(x0,S,W,T_array,0,0);
     p2_a = [p2_a,pol2_arrivals];
     ab = [ab,aborted];
     es = [es,escaped];
@@ -1924,7 +1924,7 @@ pol2_leaves = [];
 mrna_times = [];
 for j = 1:10000
     T_array = [0:.01:50];
-    [sol] = run_single_SSA_linda_one_mol(x0,S,W,T_array,time_var,signal_update_rate);
+    [sol] = run_single_SSA_one_mol(x0,S,W,T_array,time_var,signal_update_rate);
    
     t_left = sum(sol(2,:)~= 0)*.01;
     t_transcribed = sum(sol(3,:)~= 0)*.01;
@@ -2109,7 +2109,7 @@ W0 = zeros(6,1);
 W = @(x) W1*x + W0;
 
 T_array = [0:1:40000];
-[sol,bursts,p2_per_burst,burst_t,mrna_cnts] = run_single_SSA_linda_recorder_bursting([1,0,0,0]',S,W,T_array,0,0);
+[sol,bursts,p2_per_burst,burst_t,mrna_cnts] = run_single_SSA_recorder_bursting([1,0,0,0]',S,W,T_array,0,0);
 figure
 
 
@@ -2166,7 +2166,7 @@ ser5_traji = [];
 ts_traji = [];
 
 for j = 1:200
-    sol = run_single_SSA_linda_inhib(x0,S,W,[0:1:1200],time_var,signal_update_rate,parameters,inhibs,1110);
+    sol = run_single_SSA_inhib(x0,S,W,[0:1:1200],time_var,signal_update_rate,parameters,inhibs,1110);
     
         
     

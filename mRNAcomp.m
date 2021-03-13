@@ -60,7 +60,7 @@ mrna_hist = data(:,1);
 mrna_hist = mrna_hist(1:end-5);
 mrnai_traj = [];
 for i = 1:1000
-    sol = run_single_SSA_linda(x0,S,W,[0:1:2000],time_var,signal_update_rate);
+    sol = run_single_SSA(x0,S,W,[0:1:2000],time_var,signal_update_rate);
     
     ts_ssa = sol(2,:)';
     
