@@ -2,6 +2,9 @@ clear all
 close all
 clc
 %%
+
+add ./Data_files/
+
 [mrna,ser5,rnap,mrna_rnap,mrna_ser5,ser5_rnap] = load_normalization_variance_gui(1,'G0_intp');
 
 sig_dat = [rnap.mn_ac(1),ser5_rnap.mn_cc(11),mrna_rnap.mn_cc(11);...
