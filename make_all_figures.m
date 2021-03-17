@@ -1,4 +1,8 @@
 
+%% Make into a function
+
+%
+
 %% Plot fit with data for activation/activation transcription during fluct.
 %figure('visible', 'off');
 
@@ -931,6 +935,9 @@ while ikeep==1
         mh_pars = [mh_pars;mh_smpl];
         mh_vals = [mh_vals;mh_value];
         i=i+1;
+        if i == 3
+            i = i +1;
+        end
     catch
         ikeep=0;
     end    
@@ -940,7 +947,7 @@ Np = 5;
 
 mh_pars = mh_pars(:,[4,1,5,2,3]);
 
-sz = 4*(1+max(mh_vals)-mh_vals);
+sz = 2*(1+max(mh_vals)-mh_vals);
 figure(6)
 xh = 2*3*6;
 yh = 2*14.3/3;

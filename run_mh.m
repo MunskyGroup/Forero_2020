@@ -26,9 +26,9 @@ load best_simple_pars
 par_changed = [1,3:6];
 par_fixed = parameters;
 par_opt = (parameters(par_changed));
-get_err = @(pars)-2*sum(get_log_l_simplified(pars,mrna,ser5,rnap,mrna_rnap,mrna_ser5,ser5_rnap,par_fixed,par_changed));
+get_err = @(pars)-sum(get_log_l_simplified(pars,mrna,ser5,rnap,mrna_rnap,mrna_ser5,ser5_rnap,par_fixed,par_changed));
 
-delta = 0.1*par_opt;
+delta = 0.15*par_opt;
 proprnd = @(x)(x+delta.*randn(size(x)).*(randn(size(x))>0.5));
 % delta = 0.5;
 % load R_sim_for_Met_Hast
@@ -37,16 +37,19 @@ parnames = {'kon','na','kesc','kproc','beta','kout','na','eta_ctd','eta_ser5','e
     'sc_ctd','sc_ser5','sc_mrna'};
 % parnames = {'kin','kout','kinit','kabort','kesc','kdephos','ke','kon',...
 %     'koff','kproc'};
-nsamples = 1000;l
-thin = 10;
+nsamples = 1000;
+thin = 20;
 
+
+seeds = ceil(linspace(0,100,10));
 for i=1:10
+    rng(seeds(i))
     x0 = par_opt;
-    sv_file = ['met_hast_pars_2x_',num2str(i)];
+    sv_file = ['met_hast_pars_1x_',num2str(i)];
     mh_smpl=[x0];
     mh_value=[get_err(par_opt)];
     
-    for iq = 1:100
+    for iq = 1:200
         
         [mh_smpli,accepti,mh_valuei] = MetHast(mh_smpl(end,:),nsamples,'logpdf',get_err,'proprnd', ...
             proprnd,'symmetric',1,'thin',thin);
