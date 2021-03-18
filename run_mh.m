@@ -3,7 +3,7 @@ close all
 clc
 %%
 
-add ./Data_files/
+addpath Data_files/ Parameter_files/
 
 [mrna,ser5,rnap,mrna_rnap,mrna_ser5,ser5_rnap] = load_normalization_variance_gui(1,'G0_intp');
 
@@ -31,7 +31,7 @@ par_fixed = parameters;
 par_opt = (parameters(par_changed));
 get_err = @(pars)-sum(get_log_l_simplified(pars,mrna,ser5,rnap,mrna_rnap,mrna_ser5,ser5_rnap,par_fixed,par_changed));
 
-delta = 0.15*par_opt;
+delta = 0.05*par_opt;
 proprnd = @(x)(x+delta.*randn(size(x)).*(randn(size(x))>0.5));
 % delta = 0.5;
 % load R_sim_for_Met_Hast
@@ -40,27 +40,101 @@ parnames = {'kon','na','kesc','kproc','beta','kout','na','eta_ctd','eta_ser5','e
     'sc_ctd','sc_ser5','sc_mrna'};
 % parnames = {'kin','kout','kinit','kabort','kesc','kdephos','ke','kon',...
 %     'koff','kproc'};
-nsamples = 1000;
+nsamples = 5001;
+nchains = 40;
+nsegments = 20;
 thin = 20;
 
-
 seeds = ceil(linspace(0,100,10));
-for i=1:10
-    rng(seeds(i))
-    x0 = par_opt;
-    sv_file = ['met_hast_pars_1x_',num2str(i)];
-    mh_smpl=[x0];
-    mh_value=[get_err(par_opt)];
+parfor i=1:nchains    
+    sv_file = ['met_hast_pars_splitC_',num2str(i)];
+    run_chain(i,par_opt,sv_file,get_err,proprnd,thin,nsamples,nsegments) 
+end
+
+return
+%%
+par_changed = [1,3:6];
+parnames = {'kon','na','kesc','kproc','beta','kout','na','eta_ctd','eta_ser5','eta_mrna',...
+    'sc_ctd','sc_ser5','sc_mrna'};
+nchains = 40;
+nsegments = 40;
+
+close all
+figure(1)
+SPS =[];
+for i=1:nchains 
+    try
+        mh_smpl{i} = [];
+        mh_value{i} = [];
+        sv_file = ['met_hast_pars_splitC_',num2str(i)];
+        clear mh_smpl_*  mh_value_*
+        load(sv_file)
+        for j=1:nsegments
+            try
+                eval(['mh_smpl{i} = [mh_smpl{i};mh_smpl_',num2str(j),'];']);
+                eval(['mh_value{i} = [mh_value{i};mh_value_',num2str(j),'];']);
+            catch
+            end
+        end
+        figure(1)
+        subplot(4,5,i)
+        plot(mh_value{i}); hold on
+        set(gca,'ylim',[-30,-14])
+        figure(3)
+        subplot(4,5,i)
+        histogram(mh_value{i}); hold on        
+        set(gca,'xlim',[-30,-14])
+        
+        figure(4)
+        subplot(4,5,i)
+        C = xcorr(mh_value{i}-mean(mh_value{i}),mh_value{i}-mean(mh_value{i}),'coeff');
+        plot(C(floor(length(C)/2):end));
+        set(gca,'xlim',[0,10000],'ylim',[-0.1 1])
+      
+    catch
+    end
+    %     figure(1+i)
+%     for j = 1:5
+%         subplot(2,3,j); histogram(mh_smpl{i}(:,j));
+%     end
+    SPS = [SPS;mh_smpl{i}];
+end
+figure(2)
+for i=1:5  
+    subplot(5,5,(i-1)*5+i); 
+    histogram(SPS(:,i));
+    xlabel(parnames(par_changed(i)));
+    ylabel(parnames(par_changed(i)));
     
-    for iq = 1:200
-        
-        [mh_smpli,accepti,mh_valuei] = MetHast(mh_smpl(end,:),nsamples,'logpdf',get_err,'proprnd', ...
-            proprnd,'symmetric',1,'thin',thin);
-        mh_smpl = [mh_smpl;mh_smpli];
-        mh_value = [mh_value;mh_valuei];
-        accepti
-        
-        save(sv_file,'mh_smpl','mh_value')
-        
+  
+for j = i+1:5   
+        subplot(5,5,(i-1)*5+j); 
+        scatter(SPS(:,j),SPS(:,i));
+end
+end
+
+
+
+
+function run_chain(i,x0,sv_file,get_err,proprnd,thin,nsamples,nsegments)
+pause(i)
+rng('shuffle')
+for iq = 1:nsegments
+    
+    [mh_smpli,accepti,mh_valuei] = MetHast(x0,nsamples,'logpdf',get_err,'proprnd', ...
+        proprnd,'symmetric',1,'thin',thin);
+    
+    eval(['mh_smpl_',num2str(iq),'= mh_smpli(1:end-1,:);']);
+    eval(['mh_value_',num2str(iq),'= mh_valuei(1:end-1,:);']);
+    
+    x0 = mh_smpli(end,:);
+    
+    accepti
+    if iq==1
+        save(sv_file,['mh_value_',num2str(iq)],['mh_smpl_',num2str(iq)]);
+    else
+        save(sv_file,['mh_value_',num2str(iq)],['mh_smpl_',num2str(iq)],'-append');
     end
 end
+end
+
