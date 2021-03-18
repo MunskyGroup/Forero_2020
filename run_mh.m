@@ -31,7 +31,7 @@ par_fixed = parameters;
 par_opt = (parameters(par_changed));
 get_err = @(pars)-sum(get_log_l_simplified(pars,mrna,ser5,rnap,mrna_rnap,mrna_ser5,ser5_rnap,par_fixed,par_changed));
 
-delta = 0.05*par_opt;
+delta = 0.03*par_opt;
 proprnd = @(x)(x+delta.*randn(size(x)).*(randn(size(x))>0.5));
 % delta = 0.5;
 % load R_sim_for_Met_Hast
@@ -41,32 +41,37 @@ parnames = {'kon','na','kesc','kproc','beta','kout','na','eta_ctd','eta_ser5','e
 % parnames = {'kin','kout','kinit','kabort','kesc','kdephos','ke','kon',...
 %     'koff','kproc'};
 nsamples = 5001;
-nchains = 40;
-nsegments = 20;
+nchains = 20;
+nsegments = 50;
 thin = 20;
 
 seeds = ceil(linspace(0,100,10));
 parfor i=1:nchains    
-    sv_file = ['met_hast_pars_splitC_',num2str(i)];
+    sv_file = ['met_hast_pars_splitE_',num2str(i)];
     run_chain(i,par_opt,sv_file,get_err,proprnd,thin,nsamples,nsegments) 
 end
 
 return
 %%
+load best_simple_pars
 par_changed = [1,3:6];
-parnames = {'kon','na','kesc','kproc','beta','kout','na','eta_ctd','eta_ser5','eta_mrna',...
+parnames = {'omega','na','k esc','k complete','beta','k out','na','eta_ctd','eta_ser5','eta_mrna',...
     'sc_ctd','sc_ser5','sc_mrna'};
-nchains = 40;
-nsegments = 40;
+par_opt = (parameters(par_changed));
+nchains = 20;
+nsegments = 100;
 
-close all
-figure(1)
+figure(1);clf;
+figure(2);clf;
+figure(3);clf;
+figure(4);clf;
 SPS =[];
+SPv =[];
 for i=1:nchains 
     try
         mh_smpl{i} = [];
         mh_value{i} = [];
-        sv_file = ['met_hast_pars_splitC_',num2str(i)];
+        sv_file = ['met_hast_pars_splitE_',num2str(i)];
         clear mh_smpl_*  mh_value_*
         load(sv_file)
         for j=1:nsegments
@@ -80,38 +85,51 @@ for i=1:nchains
         subplot(4,5,i)
         plot(mh_value{i}); hold on
         set(gca,'ylim',[-30,-14])
+        title(num2str(mean(mh_value{i})))
+       
         figure(3)
         subplot(4,5,i)
         histogram(mh_value{i}); hold on        
         set(gca,'xlim',[-30,-14])
+        title(num2str(mean(mh_value{i})))
         
         figure(4)
-        subplot(4,5,i)
+        subplot(4,5,i); hold off
         C = xcorr(mh_value{i}-mean(mh_value{i}),mh_value{i}-mean(mh_value{i}),'coeff');
-        plot(C(floor(length(C)/2):end));
-        set(gca,'xlim',[0,10000],'ylim',[-0.1 1])
+        plot(C(floor(length(C)/2):end)); hold on
+        plot([0,50000],[0,0],'k--')
+        set(gca,'xlim',[0,50000],'ylim',[-0.3 1])
       
     catch
     end
     %     figure(1+i)
-%     for j = 1:5
-%         subplot(2,3,j); histogram(mh_smpl{i}(:,j));
-%     end
-    SPS = [SPS;mh_smpl{i}];
+    %     for j = 1:5
+    %         subplot(2,3,j); histogram(mh_smpl{i}(:,j));
+    %     end
+    if mean(mh_value{i})>-19.5
+        SPS = [SPS;mh_smpl{i}];
+        SPv = [SPv;mh_value{i}];
+    end
 end
-figure(2)
+figure(2); clf
 for i=1:5  
     subplot(5,5,(i-1)*5+i); 
-    histogram(SPS(:,i));
-    xlabel(parnames(par_changed(i)));
+    histogram(SPS(:,i),20);
     ylabel(parnames(par_changed(i)));
-    
+    A = sort(SPS(:,i)); B = [A(ceil(length(A)/10)),A(floor(9*length(A)/10))];
+    title({parnames{par_changed(i)},['[',num2str(B),']']});
+
   
-for j = i+1:5   
-        subplot(5,5,(i-1)*5+j); 
-        scatter(SPS(:,j),SPS(:,i));
+for j = 1:i-1  
+        subplot(5,5,(i-1)*5+j); hold off
+        scatter(SPS(1:500:end,j),SPS(1:500:end,i),4,SPv(1:500:end));
+        hold on
+        plot(par_opt(j),par_opt(i),'ko','markersize',10,'MarkerFaceColor','k')
 end
 end
+subplot(5,5,5);
+histogram(SPv,20);        
+        set(gca,'xlim',[-30,-14])
 
 
 

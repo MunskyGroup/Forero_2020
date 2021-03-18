@@ -19,6 +19,11 @@ err(7) = (means(3)-mean_mrna)^2/sem_mean_mrna^2/2;
 var_dat = sem_mean_mrna^2*130;
 err(8) = (SIGc(3,3)-var_dat)^2/10^2/2;
 
+% Prior - parameter values should be positive.
+err(9) = 1000*sum(max(-pars+1e-8,0));
+
+% All other remaining priors have been ignored.
+
 % frac should be between 0 and 1
 % err(9) = 100*max(0,log(parameters(7)));
 
@@ -27,12 +32,12 @@ err(8) = (SIGc(3,3)-var_dat)^2/10^2/2;
 % cv12 = 1/parameters(11);
 % cv13 = 1/parameters(12);
 % cv23 = 1/parameters(13);
-cv12 = 1/parameters(11)*sigred(2,1);
-cv13 = 1/parameters(12)*sigred(3,1);
-cv23 = 1/parameters(13)*sigred(6,1);
-sig_d = [9.7339e-01   3.4716e-01   5.0248e-01];
-sig_d_sem = [1.4262e-01   8.6887e-02   1.1456e-01];
-%err(13) = sum(abs(log([cv12,cv13,cv23]./sig_d)));
-err(13) = 0*sum(([cv12,cv13,cv23]-sig_d).^2./sig_d_sem.^2)/2;
+% cv12 = 1/parameters(11)*sigred(2,1);
+% cv13 = 1/parameters(12)*sigred(3,1);
+% cv23 = 1/parameters(13)*sigred(6,1);
+% sig_d = [9.7339e-01   3.4716e-01   5.0248e-01];
+% sig_d_sem = [1.4262e-01   8.6887e-02   1.1456e-01];
+% %err(13) = sum(abs(log([cv12,cv13,cv23]./sig_d)));
+% err(13) = 0*sum(([cv12,cv13,cv23]-sig_d).^2./sig_d_sem.^2)/2;
 
 end
