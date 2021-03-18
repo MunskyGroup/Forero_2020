@@ -3,6 +3,7 @@ if nargin<2
     TT = [0:30];
 end
 
+parameters = max(1e-8,parameters);  % enforce positive parameter constraint
 kon = parameters(1);
 koff = 1000;%parameters(2);
 kesc = parameters(3);
@@ -16,7 +17,6 @@ eta_ts = parameters(10);
 
 if frac > 1
     frac = 1;
-    
 end
 
 %%
