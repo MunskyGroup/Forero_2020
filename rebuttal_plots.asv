@@ -849,7 +849,7 @@ h = fill([par_highlight(1),par_highlight(end),par_highlight(end),par_highlight(1
 
 legend('Model Ser5ph-CTD Delay', 'Experimental delay range','Overlap')
 
-cd ../..
+cd ..
 
 
 %%
@@ -912,7 +912,7 @@ fig1.PaperPosition = [0, 0, xh, 1.1*yh]; % x,y, width, height
 
 for i = 1:4
     
-    sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);  
+    sol = run_single_SSA_linda(x0,S,W,T_array,time_var,signal_update_rate);  
     subplot(4,2,2*i)
     pol2_ssa = sol(2,:)';
     ser5_ssa = sol(2,:)';

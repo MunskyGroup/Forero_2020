@@ -1,4 +1,7 @@
+%% This code generates a comparison of all models ACC/CCs 
+
 %%
+
 %Set up figure sizes
 clc; close all; clear all;
 X_SIZE = 13; Y_SIZE = 15;
@@ -19,7 +22,7 @@ rng(0)
 addpath('./Data_files')
 addpath('./Model_files')
 addpath('./Parameter_files')
-
+addpath('./Functions')
 colors = [[239, 71, 111];
            [255, 209, 102];
            [6, 214, 160];
