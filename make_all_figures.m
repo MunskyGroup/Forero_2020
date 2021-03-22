@@ -26,6 +26,9 @@ yyaxis left
 addpath('./Data_files')
 addpath('./Model_files')
 addpath('./Parameter_files')
+addpath('./Functions')
+addpath('./Model_fits/simple_MH_results/3.17.2021')
+
 rng(0)
 
 %% Load in data from excel files and normalize them
@@ -737,25 +740,30 @@ end
 
 figure(1)
 subplot(4,3,2)
-plot( [mean(rnap_bootstrapped_tau),mean(rnap_bootstrapped_tau)], [-1,6],'r', 'LineWidth',2)
+plot( [mean(rnap_bootstrapped_tau),mean(rnap_bootstrapped_tau)], [-1,6],'r', 'LineWidth',2); hold on;
 x1 = mean(rnap_bootstrapped_tau)-std(rnap_bootstrapped_tau);
 x2 = mean(rnap_bootstrapped_tau)+std(rnap_bootstrapped_tau);
 fill( [x1,x2, x2,x1], [-1,-1,6,6],'r', 'FaceAlpha',.2,'LineStyle','--','edgecolor','r')
+xlim([-.5,25])
+ylim([-.1,1.3])
 
 subplot(4,3,5)
-plot( [mean(ser5_bootstrapped_tau),mean(ser5_bootstrapped_tau)], [-1,6],'g', 'LineWidth',2)
+plot( [mean(ser5_bootstrapped_tau),mean(ser5_bootstrapped_tau)], [-1,6],'g', 'LineWidth',2); hold on;
 x1 = mean(ser5_bootstrapped_tau)-std(ser5_bootstrapped_tau);
 x2 = mean(ser5_bootstrapped_tau)+std(ser5_bootstrapped_tau);
 fill( [x1,x2, x2,x1], [-1,-1,6,6],'g', 'FaceAlpha',.2,'LineStyle','--','edgecolor','g')
+xlim([-.5,25])
+ylim([-.1,1.3])
 
 subplot(4,3,8)
-plot( [mean(mrna_bootstrapped_tau),mean(mrna_bootstrapped_tau)], [-1,6],'b', 'LineWidth',2)
+plot( [mean(mrna_bootstrapped_tau),mean(mrna_bootstrapped_tau)], [-1,6],'b', 'LineWidth',2); hold on;
 
 
 x1 = mean(mrna_bootstrapped_tau)-std(mrna_bootstrapped_tau);
 x2 = mean(mrna_bootstrapped_tau)+std(mrna_bootstrapped_tau);
 fill( [x1,x2, x2,x1], [-1,-1,6,6],'b', 'FaceAlpha',.2,'LineStyle','--','edgecolor','b')
-
+xlim([-.5,25])
+ylim([-.1,1.3])
 
 
 
