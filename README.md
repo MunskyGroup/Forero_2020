@@ -8,6 +8,11 @@ Repository for all modelling data and associated MATLAB codes for
 https://www.biorxiv.org/content/10.1101/2020.04.03.024414v1
 [link to accepted paper]
 
+
+--------
+
+![model diagram](./simplemodel.png)
+
 --------
 ## Data files
 * ```./Data_files```
