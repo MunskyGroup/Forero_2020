@@ -73,26 +73,90 @@ mh_vals = [];
 ikeep = 1;
 i=1; 
 
-cd Model_fits\simple_MH_results\3.24.2020\
-while ikeep==1
+
+% 
+% cd Model_fits\simple_MH_results\3.24.2020\
+% while ikeep==1
+%     try
+%         fn = ['met_hast_pars_2x_',num2str(i),'.mat'];
+%         load(fn)
+%         mh_pars = [mh_pars;mh_smpl];
+%         mh_vals = [mh_vals;mh_value];
+%         i=i+1;
+%     catch
+%         ikeep=0;
+%     end    
+% end
+
+
+
+
+% cd ..\..\..
+
+rng(0)
+par_changed = [1,3:6];
+parnames = {'kon','na','kesc','kproc','beta','kout','na','eta_ctd','eta_ser5','eta_mrna',...
+    'sc_ctd','sc_ser5','sc_mrna'};
+nchains = 40;
+nsegments = 40;
+
+close all
+figure(1)
+SPS =[];
+mh_val_all = [];
+
+
+
+for i=1:nchains 
     try
-        fn = ['met_hast_pars_2x_',num2str(i),'.mat'];
-        load(fn)
-        mh_pars = [mh_pars;mh_smpl];
-        mh_vals = [mh_vals;mh_value];
-        i=i+1;
+        mh_smpl{i} = [];
+        mh_value{i} = [];
+        sv_file = ['met_hast_pars_splitE_',num2str(i)];
+        clear mh_smpl_*  mh_value_*
+        load(sv_file)
+        
+       
+        
+        for j=1:nsegments
+            try
+                eval(['mh_smpl{i} = [mh_smpl{i};mh_smpl_',num2str(j),'];']);
+                eval(['mh_value{i} = [mh_value{i};mh_value_',num2str(j),'];']);
+            catch
+            end
+        end
+        figure(1)
+        subplot(4,5,i)
+        plot(mh_value{i}); hold on
+        set(gca,'ylim',[-30,-14])
+        figure(3)
+        subplot(4,5,i)
+        histogram(mh_value{i}); hold on        
+        set(gca,'xlim',[-30,-14])
+        
+        figure(4)
+        subplot(4,5,i)
+        C = xcorr(mh_value{i}-mean(mh_value{i}),mh_value{i}-mean(mh_value{i}),'coeff');
+        plot(C(floor(length(C)/2):end));
+        set(gca,'xlim',[0,10000],'ylim',[-0.1 1])
+      
     catch
-        ikeep=0;
-    end    
+    end
+    %     figure(1+i)
+%     for j = 1:5
+%         subplot(2,3,j); histogram(mh_smpl{i}(:,j));
+%     end
+    SPS = [SPS;mh_smpl{i}];
+    mh_val_all = [mh_val_all; mh_value{i}]; 
 end
 
-cd ..\..\..
+mh_pars = SPS;
 
 par_fixed = parameters;
 par_changed = [1,3:6];
 parameters_samp = parameters;
 
 lags1 = [0:31];   
+%%
 
 fntsize = 18;   %set up figure 3
 close all
@@ -120,7 +184,8 @@ parameters_samp = parameters;
 
 minvec = sigred(1,:);
 maxvec = sigred(1,:);   %randomly sample 50 mh par lines to generate gray lines
-for i=1:50
+rng(0)
+for i=1:1000
     n = ceil(rand*size(mh_pars,1));
     
 
@@ -183,8 +248,8 @@ parameters_samp = parameters;
 pt = 5;
 minvec = sigred(pt,:);
 maxvec = sigred(pt,:);
-
-for i=1:50   %sample and get min / max from 50 random mh signals
+rng(0)
+for i=1:1000   %sample and get min / max from 50 random mh signals
     n = ceil(rand*size(mh_pars,1));
     
     parameters_samp(par_changed) = par_samp;
@@ -239,8 +304,8 @@ parameters_samp = parameters;
 pt = 9;
 minvec = sigred(pt,:);
 maxvec = sigred(pt,:);
-
-for i=1:50   %get mh min and max for gray fill
+rng(0)
+for i=1:1000   %get mh min and max for gray fill
     n = ceil(rand*size(mh_pars,1));
     
     parameters_samp(par_changed) = par_samp;
@@ -296,8 +361,9 @@ parameters_samp = parameters;
 
 minvec = [sigred(4,end:-1:2),sigred(2,:)];  %pull the mh min max for fill of gray 
 maxvec = [sigred(4,end:-1:2),sigred(2,:)];
+rng(0)
 
-for i=1:50
+for i=1:1000
     n = ceil(rand*size(mh_pars,1));
     
     parameters_samp(par_changed) = par_samp;
@@ -351,8 +417,9 @@ parameters_samp = parameters;
 minvec = [sigred(7,end:-1:2),sigred(3,:)];
 maxvec = [sigred(7,end:-1:2),sigred(3,:)];
 
+rng(0)
 
-for i=1:50  %load min and max mh_pars for gray bars
+for i=1:1000  %load min and max mh_pars for gray bars
     n = ceil(rand*size(mh_pars,1));
     
     parameters_samp(par_changed) = par_samp;
@@ -404,8 +471,9 @@ parameters_samp = parameters;
 
 minvec = [sigred(8,end:-1:2),sigred(6,:)];
 maxvec = [sigred(8,end:-1:2),sigred(6,:)];
+rng(0)
 
-for i=1:50
+for i=1:1000
     n = ceil(rand*size(mh_pars,1));
     
     parameters_samp(par_changed) = par_samp;
@@ -437,8 +505,8 @@ title({'mRNA-Ser5ph'},'FontSize',fntsize,'FontWeight','bold')
 
 xlim([-10,10])
 ylim([-.1,1.3])
-
 saveas(gca,'./Figures/ccs_nodist.epsc')
+
 
 %% SSA trajectory for bottom of figure 3
 kon = parameters(1);
@@ -522,7 +590,7 @@ ylim([-.5,1.5])
 saveas(gca, './Figures/trace.epsc')  %save the whole figure
 
 
-pause
+
 %% Acov taus
 T_array = [0:1:1000];
 
@@ -693,7 +761,7 @@ fill( [x1,x2, x2,x1], [-1,-1,6,6],'b', 'FaceAlpha',.2,'LineStyle','--','edgecolo
 
 saveas(gca, './Figures/corrs_with_dwell.epsc')  %save the whole figure
 
-
+return
 %% Supplemental Figure
 % Plot the molecule signals with bursting highlighted and filled in 
 
@@ -915,38 +983,97 @@ saveas(gca, './Figures/tshist_nolabels.epsc')
 
 %% MH plots
 
-addpath ../Data_files/
-addpath ../
+% addpath ../Data_files/
+% addpath ../
 
-cd ./Model_fits/simple_MH_results/3.24.2020/
+%cd ./Model_fits/simple_MH_results/3.24.2020/
 parnames = {'kon','kesc','kproc','beta','kout'};
 parnames = {'beta','omega','k out','k esc','k complete'};
 
 par_changed = [1:5];
+% 
+% mh_pars = [];
+% mh_vals = [];
+% ikeep = 1;
+% i=1;
+% while ikeep==1
+%     try
+%         fn = ['met_hast_pars_2x_',num2str(i),'.mat'];
+%         load(fn)
+%         mh_pars = [mh_pars;mh_smpl];
+%         mh_vals = [mh_vals;mh_value];
+%         i=i+1;
+%         if i == 3
+%             i = i +1;
+%         end
+%     catch
+%         ikeep=0;
+%     end    
+% end
+% cd ../../..
+% Np = 5;
+% 
+% mh_pars = mh_pars(:,[4,1,5,2,3]);
 
-mh_pars = [];
-mh_vals = [];
-ikeep = 1;
-i=1;
-while ikeep==1
+
+
+par_changed = [1,3:6];
+parnames = {'ω','na','k_{esc}','k_c','β','k_{ab}','na','eta_ctd','eta_ser5','eta_mrna',...
+    'sc_ctd','sc_ser5','sc_mrna'};
+nchains = 40;
+nsegments = 40;
+
+close all
+figure(1)
+SPS =[];
+mh_val_all = [];
+
+
+
+for i=1:nchains 
     try
-        fn = ['met_hast_pars_2x_',num2str(i),'.mat'];
-        load(fn)
-        mh_pars = [mh_pars;mh_smpl];
-        mh_vals = [mh_vals;mh_value];
-        i=i+1;
-        if i == 3
-            i = i +1;
+        mh_smpl{i} = [];
+        mh_value{i} = [];
+        sv_file = ['met_hast_pars_splitE_',num2str(i)];
+        clear mh_smpl_*  mh_value_*
+        load(sv_file)
+        
+       
+        
+        for j=1:nsegments
+            try
+                eval(['mh_smpl{i} = [mh_smpl{i};mh_smpl_',num2str(j),'];']);
+                eval(['mh_value{i} = [mh_value{i};mh_value_',num2str(j),'];']);
+            catch
+            end
         end
+%         figure(1)
+%         subplot(4,5,i)
+%         plot(mh_value{i}); hold on
+%         set(gca,'ylim',[-30,-14])
+%         figure(3)
+%         subplot(4,5,i)
+%         histogram(mh_value{i}); hold on        
+%         set(gca,'xlim',[-30,-14])
+%         
+%         figure(4)
+%         subplot(4,5,i)
+%         C = xcorr(mh_value{i}-mean(mh_value{i}),mh_value{i}-mean(mh_value{i}),'coeff');
+%         plot(C(floor(length(C)/2):end));
+%         set(gca,'xlim',[0,10000],'ylim',[-0.1 1])
+%       
     catch
-        ikeep=0;
-    end    
+    end
+    %     figure(1+i)
+%     for j = 1:5
+%         subplot(2,3,j); histogram(mh_smpl{i}(:,j));
+%     end
+    SPS = [SPS;mh_smpl{i}];
+    mh_val_all = [mh_val_all; mh_value{i}]; 
 end
-cd ../../..
-Np = 5;
 
-mh_pars = mh_pars(:,[4,1,5,2,3]);
 
+mh_vals = mh_val_all;
 sz = 2*(1+max(mh_vals)-mh_vals);
 figure(6)
 xh = 2*3*6;
@@ -955,6 +1082,19 @@ fntsize = 18;
 fig1= gcf;
 fig1.PaperUnits = 'centimeters';
 fig1.PaperPosition = [0, 0, xh, 3*yh]; % x,y, width, height
+
+
+mh_pars = SPS(:,[4,1,5,2,3]);
+par_changed = [5,1,6,3,4];
+
+[sorted_mh_vals, mh_val_inds] = sort(mh_vals); 
+mh_par_sort = mh_pars(mh_val_inds,:);
+colormap(flipud(parula))
+
+mh_val_new = -sort(mh_vals);
+mh_val_new(mh_val_new > mh_val_new(.005*(length(mh_val_new)))) = mh_val_new(.005*(length(mh_val_new)));
+
+Np = 5;
 for i=1:Np
     subplot(Np,Np,(i-1)*Np+i)
 
@@ -991,35 +1131,192 @@ for i=1:Np
 
         set (gca ,'TickLength',[.01,.3],'LineWidth',2);
     set (gca ,'FontSize',fntsize,'FontName', 'Arial');
-    for j=i+1:Np
+    
+    
+   for j=i+1:Np
         subplot(Np,Np,(j-1)*Np+i)
-
-        scatter(mh_pars(1:100:end,i),mh_pars(1:100:end,j),sz(1:100:end),'filled','MarkerFaceAlpha',1,'MarkerEdgeAlpha',1,'MarkerFaceColor',[50, 139, 191]./256,'MarkerEdgeColor',[50, 139, 191]./256); hold on
-        scatter(mh_pars(1:100:end,i),mh_pars(1:100:end,j),sz(1:100:end),'filled','MarkerFaceAlpha',.2,'MarkerEdgeAlpha',.2,'MarkerFaceColor',[1,.5,0]); hold on
+         scatter(mh_par_sort(1:100:end,i),mh_par_sort(1:100:end,j),sz(1:100:end),mh_val_new(1:100:end),'filled','MarkerFaceAlpha',.2,'MarkerEdgeAlpha',.2); hold on
+        
+%          scatter(mh_pars(1:100:end,i),mh_pars(1:100:end,j),sz(1:100:end),mh_vals(1:100:end),'filled','MarkerFaceAlpha',1,'MarkerEdgeAlpha',1,'MarkerFaceColor',[50, 139, 191]./256,'MarkerEdgeColor',[50, 139, 191]./256); hold on
+%          scatter(mh_pars(1:100:end,i),mh_pars(1:100:end,j),sz(1:100:end),mh_vals(1:100:end),'filled','MarkerFaceAlpha',.04,'MarkerEdgeAlpha',.04,'MarkerFaceColor',[0,1,0]); hold on
+%          scatter(mh_pars(1:100:end,i),mh_pars(1:100:end,j),sz(1:100:end),mh_vals(1:100:end),'filled','MarkerFaceAlpha',.007,'MarkerEdgeAlpha',.007,'MarkerFaceColor',[1,1,0]); hold on
 
         plot(mh_pars(1,i),mh_pars(1,j),'ko','markersize',8,'markerfacecolor','k')
         if i==1
             ylabel({parnames{par_changed(j)}},'FontSize',fntsize,'FontWeight','bold');
+            
+            
         end
         if j==Np
             xlabel({parnames{par_changed(i)}} ,'FontSize',fntsize,'FontWeight','bold');
         end
         set (gca ,'TickLength',[.01,.3],'LineWidth',2);
         set (gca ,'FontSize',fntsize,'FontName', 'Arial');
-    end
+   end
     
+
+%     for j=i+1:Np
+%         subplot(Np,Np,(j-1)*Np+i)
+% 
+%         scatter(mh_pars(1:100:end,i),mh_pars(1:100:end,j),sz(1:100:end),'filled','MarkerFaceAlpha',1,'MarkerEdgeAlpha',1,'MarkerFaceColor',[50, 139, 191]./256,'MarkerEdgeColor',[50, 139, 191]./256); hold on
+%         scatter(mh_pars(1:100:end,i),mh_pars(1:100:end,j),sz(1:100:end),'filled','MarkerFaceAlpha',.2,'MarkerEdgeAlpha',.2,'MarkerFaceColor',[1,.5,0]); hold on
+% 
+%         plot(mh_pars(1,i),mh_pars(1,j),'ko','markersize',8,'markerfacecolor','k')
+%         if i==1
+%             ylabel({parnames{par_changed(j)}},'FontSize',fntsize,'FontWeight','bold');
+%         end
+%         if j==Np
+%             xlabel({parnames{par_changed(i)}} ,'FontSize',fntsize,'FontWeight','bold');
+%         end
+%         set (gca ,'TickLength',[.01,.3],'LineWidth',2);
+%         set (gca ,'FontSize',fntsize,'FontName', 'Arial');
+%     end
+%     
     
 end
+   subplot(5,5,2)
+   scatter(mh_par_sort(1:100:end,1),mh_par_sort(1:100:end,2),sz(1:100:end),mh_val_new(1:100:end),'filled','MarkerFaceAlpha',.2,'MarkerEdgeAlpha',.2); hold on
+   
 
+   
+   colorbar
+    %delete(subplot(5,5,2))
 saveas(gca,'./Figures/sensitivity.epsc')
 
+%%
+% kon = mh_pars(:,1);
+% koff = 1000;
+% kesc = mh_pars(:,2);
+% kproc = mh_pars(:,3);
+% kin = mh_pars(:,4)*koff;
+% kout = mh_pars(:,5);
+% 95% confidence 
+highv = 97.5/100
+lowv = 2.5/100
+beta = mh_pars(:,1);
+omega = mh_pars(:,2);
+kout = mh_pars(:,3);
+kesc = mh_pars(:,4);
+kcomp = mh_pars(:,5);
 
-kon = mh_pars(:,1);
+table_names = {'beta','omega','kab','kproc','kesc','r','time_cluster','mean_cluster','frac','burst_mrna','rate_mrna','total_rnap','mrna_dwell'};
+tbl = [];
+beta_sort = sort(beta);
+low = beta_sort(floor(length(beta_sort)*lowv));
+high = beta_sort(ceil(highv* length(beta_sort)));
+
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+omega_sort = sort(omega(1:100:end));
+low = omega_sort(floor(length(omega_sort)*lowv));
+high = omega_sort(ceil(highv* length(omega_sort)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+kout_sort = sort(kout(1:100:end));
+low = kout_sort(floor(length(kout_sort)*lowv));
+high = kout_sort(ceil(highv* length(kout_sort)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+
+kproc_sort = sort(kcomp);
+low = kproc_sort(floor(length(kproc_sort)*lowv));
+high = kproc_sort(ceil(highv* length(kproc_sort)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+kesc_sort = sort(kesc);
+low = kesc_sort(floor(length(kesc_sort)*lowv));
+high = kesc_sort(ceil(highv* length(kesc_sort)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+
+r = beta.*omega;
+
+r =  sort(r);
+low = r(floor(length(r)*lowv));
+high = r(ceil(highv* length(r)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+t_clust = 1./(kesc + kout);
+
+t_clust =  sort(t_clust);
+low = t_clust(floor(length(t_clust)*lowv));
+high = t_clust(ceil(highv* length(t_clust)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+u_clust = (beta.*omega)./(kesc + kout);
+
+u_clust =  sort(u_clust);
+low = u_clust(floor(length(u_clust)*lowv));
+high = u_clust(ceil(highv* length(u_clust)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+f = kesc./(kesc + kout);
+
+f =  sort(f);
+low = f(floor(length(f)*lowv));
+high = f(ceil(highv* length(f)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+bmrna = kesc./(kesc + kout).*beta;
+
+bmrna =  sort(bmrna);
+low = bmrna(floor(length(bmrna)*lowv));
+high = bmrna(ceil(highv* length(bmrna)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+rmrna = ((beta.*omega)./(kesc + kout)).*kesc;
+
+rmrna =  sort(rmrna);
+low = rmrna(floor(length(rmrna)*lowv));
+high = rmrna(ceil(highv* length(rmrna)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+rmrna = ((beta.*omega)./(kesc + kout)).*(kesc ./kcomp)  ;
+
+rmrna =  sort(rmrna);
+low = rmrna(floor(length(rmrna)*lowv));
+high = rmrna(ceil(highv* length(rmrna)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+
+totalrnap = ((beta.*omega)./(kesc + kout)).*(kesc ./kcomp) + ((beta.*omega)./(kesc + kout))  ;
+
+totalrnap =  sort(totalrnap);
+low = totalrnap(floor(length(totalrnap)*lowv));
+high = totalrnap(ceil(highv* length(totalrnap)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+mrnat = 1./kcomp;
+mrnat =  sort(mrnat);
+low = mrnat(floor(length(mrnat)*lowv));
+high = mrnat(ceil(highv* length(mrnat)));
+disp([low, high])
+tbl = [tbl; [low,high]];
+
+
+
+%%
+
+kon = mh_pars(:,2);
 koff = 1000;
-kesc = mh_pars(:,2);
-kproc = mh_pars(:,3);
-kin = mh_pars(:,4)*koff;
-kout = mh_pars(:,5);
+kesc = mh_pars(:,3);
+kproc = mh_pars(:,5);
+kin = mh_pars(:,1)*koff;
+kout = mh_pars(:,4);
+
 
 mu_ctd = kon./(kon+koff).*kin./(kout+kesc);
 mu_ctd(1)

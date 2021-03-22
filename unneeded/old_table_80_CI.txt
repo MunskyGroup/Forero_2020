@@ -1,0 +1,32 @@
+\begin{table}
+\centering
+\caption{Derived Quantities and Confidence Intervals Resulting from Model Fit to Data}
+\medskip
+\hspace*{-2cm}\begin{tabular}{|c|c|c|}
+\hline
+{\bf Derived Quantity} & {\bf Formula} & {\bf Value (\textcolor{red}{95}\% CI Range)}\\
+\hline\hline
+Average RNAP2 burst size & $\beta$ & 15.4 \textcolor{red}{(11.76-61.83)} %(13.3-22.4)
+\\\hline
+Average RNAP2 burst frequency & $\omega$ & 0.43 (0.38 -0.52) min$^{-1}$
+\\\hline
+Average RNAP2 arrival rate & $r = \omega\cdot \beta$ & 6.622 (6.131-9.974) min$^{-1}$
+\\\hline
+Average time RNAP2 spends in cluster & $\tau_{\rm \textcolor{red}{\text{Cluster}}} = 1/(k_{\rm \textcolor{red}{\text{esc}}}+k_{\rm \textcolor{red}{\text{ab}}})$ & 0.692 (0.171-0.775) min 
+\\\hline
+Average RNAP2 in cluster & $\mu_{\rm \textcolor{red}{\text{Cluster}}} = r/(k_{\rm \textcolor{red}{\text{esc}}}+k_{\rm \textcolor{red}{\text{ab}}})$ & 4.624 (1.7046-5.166)
+\\\hline
+Probability of RNAP2 in cluster to escape & $f = k_{\rm \textcolor{red}{\text{esc}}}/(k_{\rm \textcolor{red}{\text{esc}}}+k_{\rm \textcolor{red}{\text{ab}}})$&0.4615 (.293-.511)
+\\\hline
+Average mRNA burst size & $\beta_{\rm \textcolor{red}{\text{mRNA}}} = f\cdot \beta$ & 7.11 (6.000-7.728)
+\\ \hline 
+Average mRNA production rate &$r_{\rm \textcolor{red}{\text{mRNA}}}=\mu_{\rm \textcolor{red}{\text{Cluster}}}\cdot k_{\rm \textcolor{red}{\text{esc}}}$ &3.083 (2.792-3.295) min$^{-1}$
+\\\hline
+Average actively transcribing RNAP2 & $\mu_{\rm \textcolor{red}{\text{mRNA}}} = \mu_{\rm \textcolor{red}{\text{Cluster}}}\cdot k_{\rm \textcolor{red}{\text{esc}}}/k_{\textcolor{red}{\text{c}}}$& 15.512 (14.668-16.352) \\\hline
+Average total RNAP2 at transcription site & $\mu_{\rm \textcolor{red}{\text{Total}}} = \mu_{\rm \textcolor{red}{\text{Cluster}}}+\mu_{\rm \textcolor{red}{\text{mRNA}}}$ & 20.136 (17.048-20.989)
+\\ \hline
+Average time for mRNA completion &$\tau_{\rm \textcolor{red}{\text{mRNA}}} = 1/k_{\rm \textcolor{red}{\text{c}}}$&5.032 (4.795-5.440) min
+\\\hline
+\end{tabular}
+\hspace*{-1cm}
+\end{table}

@@ -1,0 +1,5 @@
+* fix table 1 with new parameters and 95% CI range
+* update figure 3 table with 95% CI range
+
+[x] Sup fig 7 caption
+Update the total number of points in pdf
