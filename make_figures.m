@@ -53,7 +53,9 @@ global_color = 'k';
     norm_intensity = 0;
     minYlim = -0.1;
     maxYlim = 5;
-    yyaxis left
+    yyaxis left   
+    
+    %add the local paths 
     addpath('./Data_files')
     addpath('./Model_files')
     addpath('./Parameter_files')
@@ -91,7 +93,6 @@ SPS =[];
 mh_val_all = [];
 
 
-
 if strcmp(paper_fig_num,'3a')
     %% make figure 3a, cross and autocorrelations
     
@@ -104,14 +105,11 @@ if strcmp(paper_fig_num,'3a')
             clear mh_smpl_*  mh_value_*
             tmp_dat = load(sv_file);
 
-
-
             for j=1:nsegments
-                %try
+
                     eval(['mh_smpl{i} = [mh_smpl{i};tmp_dat.mh_smpl_',num2str(j),'];']);
                     eval(['mh_value{i} = [mh_value{i};tmp_dat.mh_value_',num2str(j),'];']);
-                %catch
-                %end
+
             end
 
         SPS = [SPS;mh_smpl{i}];
@@ -119,11 +117,6 @@ if strcmp(paper_fig_num,'3a')
     end
 
     mh_pars = SPS;
-
-    par_fixed = parameters;
-    par_changed = [1,3:6];
-    parameters_samp = parameters;
-
     lags1 = [0:31];   
     %% RNAP AUTOCORRELATION
 
@@ -629,7 +622,7 @@ if strcmp(paper_fig_num,'3a')
 
     end
 
-
+    % add the dwell time lines on the autocorrelations
     figure(1)
     subplot(4,3,2)
     plot( [mean(rnap_bootstrapped_tau),mean(rnap_bootstrapped_tau)], [-1,6],'r', 'LineWidth',2); hold on;
@@ -685,18 +678,18 @@ if strcmp(paper_fig_num,'3f')
 
 
     Nstates = 3;  %set up propensity and stoich matrixes to run the gillespie
-    b = zeros(Nstates,1);
+    b = zeros(Nstates,1); 
     b(1) = kon;
 
     c = zeros(3,3);
     c(1,1:3)=[0,1,1];
-    c(2,1:3)=[0,frac,1];
+    c(2,1:3)=[0,frac,1];  %signal matrix
     c(3,3)=1;
 
     S = zeros(3,6);
     W1 = zeros(6,3);
     W0 = zeros(6,1);
-    S(1,1) = 1;  W1(1,1) = -kon; W0(1,1) = kon;
+    S(1,1) = 1;  W1(1,1) = -kon; W0(1,1) = kon; %fill in the rates
     S(1,2) = -1; W1(2,1) = koff; 
 
     S(2,3) = 1; W1(3,1) = kin; 
@@ -706,12 +699,12 @@ if strcmp(paper_fig_num,'3f')
     S(3,6) = -1; W1(6,3) = kproc; 
 
 
-    x0 = [0,0,0]';
-    T_array = [0:1:1000];
+    x0 = [0,0,0]';  %inital condition
+    T_array = [0:1:1000];  %time vector
     time_var = 0;
     signal_update_rate = 0;
 
-    W = @(x) W1*x + W0;
+    W = @(x) W1*x + W0;  %propensity function
     rng(45)
     %Solve a single trajectory with seed 45
     sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);  
@@ -721,7 +714,7 @@ if strcmp(paper_fig_num,'3f')
     ts_ssa = sol(3,:)';
 
     [pol2_ssa,ser5_ssa,ts_ssa,~] = get_model_intesities(sol,eta_rnap,eta_ser5,eta_ts); %convert molecules to signal
-    [pol2norm,ser5norm,tsnorm] = Normalize_simulated_intensities(.95,pol2_ssa,ser5_ssa,ts_ssa);
+    [pol2norm,ser5norm,tsnorm] = Normalize_simulated_intensities(.95,pol2_ssa,ser5_ssa,ts_ssa); %normalize the simulated signals
 
     X_SIZE = 13; Y_SIZE = 15;
     figure(1);clf;
@@ -735,7 +728,7 @@ if strcmp(paper_fig_num,'3f')
     fig1.PaperPosition = [0, 0, xh, 1.1*yh]; % x,y, width, height
 
 
-    avpol2 =movmean(pol2norm(end-200:end),3);
+    avpol2 =movmean(pol2norm(end-200:end),3); %moving average the trajectories
     avser5 = movmean(ser5norm(end-200:end),3);
     avts = movmean(tsnorm(end-200:end),3);
     plot(avpol2(1:201),'r','linewidth',2); hold on; plot(avser5(1:201),'g','linewidth',2); plot(avts(1:201),'b','linewidth',2 )
@@ -761,6 +754,7 @@ end
 % Plot the molecule signals with bursting highlighted and filled in 
 if strcmp(paper_fig_num,'sup8a')
     
+    %rename the parameters
     kon = parameters(1);
     koff = 1000;%parameters(2);
     kesc = parameters(3);
@@ -779,13 +773,13 @@ if strcmp(paper_fig_num,'sup8a')
 
     c = zeros(3,3);
     c(1,1:3)=[0,1,1];
-    c(2,1:3)=[0,frac,1];
+    c(2,1:3)=[0,frac,1]; %signal matrix
     c(3,3)=1;
 
     S = zeros(3,6);
     W1 = zeros(6,3);
     W0 = zeros(6,1);
-    S(1,1) = 1;  W1(1,1) = -kon; W0(1,1) = kon;
+    S(1,1) = 1;  W1(1,1) = -kon; W0(1,1) = kon;  %fill in the S and W1 matrix
     S(1,2) = -1; W1(2,1) = koff; 
 
     S(2,3) = 1; W1(3,1) = kin; 
@@ -796,25 +790,25 @@ if strcmp(paper_fig_num,'sup8a')
 
 
     x0 = [0,0,0]';
-    T_array = [0:1:1000];
+    T_array = [0:1:1000]; %time vector
     time_var = 0;
     signal_update_rate = 0;
 
-    W = @(x) W1*x + W0;
+    W = @(x) W1*x + W0; %propensity function
     figure(1)
-    rng(1095)
+    rng(1095) %set the seed
     fig1= gcf;
     fig1.PaperUnits = 'centimeters';
     fig1.PaperPosition = [0, 0, xh, yh]; % x,y, width, height
     T_array = [0:.1:200];
     sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
 
-    pol2_ssa = (sol(2,:) + sol(3,:))';
+    pol2_ssa = (sol(2,:) + sol(3,:))'; %pol2 is in all channels
     ser5_ssa = (sol(2,:)+ sol(3,:))';
     ts_ssa = sol(3,:)';
 
 
-    bubble_top = pol2_ssa(end-500:end);
+    bubble_top = pol2_ssa(end-500:end);  %get top and bottom for red fill
     bubble_bottom = ts_ssa(end-500:end);
 
     p2 = pol2_ssa(end-500:end)-ts_ssa(end-500:end);
@@ -1394,7 +1388,7 @@ if strcmp(paper_fig_num, 'sup10')
     ts_traji = [];
     n = 0;
     while n < 7
-
+        %solve an inhibited trajectory
         sol = run_single_SSA_inhib(x0,S,W,[0:1:1200],time_var,signal_update_rate,parameters,inhibs,1110);
         sol(2,1110);
         if sol(3,1110) > means(3)
@@ -1413,9 +1407,6 @@ if strcmp(paper_fig_num, 'sup10')
             ts_traj = [ts_traj; ts_ssa'];
 
         end
-
-
-
 
     end
 
@@ -1565,11 +1556,6 @@ if strcmp(paper_fig_num, 'sup10')
     end
 
 
-
-
-
-
-
     end
     if save_eps
         saveas(gca,'./Figures/perturbs_sep1.epsc')
@@ -1660,11 +1646,11 @@ if strcmp(paper_fig_num, 'sup8b')
 
 
 
-
+    %store the points here
     X = [mean(npts_pol2),mean(npts_ts)];
 
 
-    time_elongating = 5.2/4.1;     
+    time_elongating = 5.2/4.1;     %assume a speed of 4.1 kb/min on a 5.2 kb construct
     residence = 1/kproc;
     time_processing = residence - time_elongating;
 
@@ -1708,7 +1694,7 @@ if strcmp(paper_fig_num, 'sup8b')
     fig1.PaperPosition = [0, 0, 1*xh, yh]; % x,y, width, height
 
     %while length(npts) < 2000
-    while length(npts_ts) < 500
+    while length(npts_ts) < 500 %wait until we collect enough timepoints in a transient condition
         length(npts_ts) 
         T_array = [0:1:40000];
         sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
@@ -1886,31 +1872,6 @@ if strcmp(paper_fig_num, 'sup8b')
     end
     return
 
-end
-
-
-
-
-function [thresh,std_mod] = compute_thresh(ssa,eta,tr)
-std_mod = std(ssa);
-shot_mod = std_mod*eta;
-ssa_w_shot = ssa + randn(size(ssa))*shot_mod;
-% Define fraction tr as zero
-tmp = sort(ssa_w_shot);
-thresh = tmp(ceil(length(tmp)*tr));
-
-end
-
-
-
-function ssa_w_shot = add_shot_std(ssa,eta,stdev,thresh)
-std_mod = stdev;
-shot_mod = std_mod*eta;
-ssa_w_shot = ssa + randn(size(ssa))*shot_mod;
-
-% Define fraction tr as zero
-
-ssa_w_shot = ssa_w_shot-thresh;
 end
 
 
