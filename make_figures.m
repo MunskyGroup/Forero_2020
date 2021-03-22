@@ -653,9 +653,10 @@ if strcmp(paper_fig_num,'3a')
     if save_eps
         saveas(gca, './Figures/corrs_with_dwell.epsc')  %save the whole figure
     end
+    
     return
+    end
 end
-
 
 
 
@@ -1049,21 +1050,20 @@ if strcmp(paper_fig_num,'sup7')
 
     % load in the saved chains here
     for i=1:nchains 
-        try
+       
             mh_smpl{i} = [];
             mh_value{i} = [];
-            sv_file = ['met_hast_pars_splitE_',num2str(i)];
+            sv_file = ['./Model_fits/simple_MH_results/3.17.2021/met_hast_pars_splitE_',num2str(i)];
             clear mh_smpl_*  mh_value_*
             tmp_dat = load(sv_file);
 
 
 
             for j=1:nsegments
-                try
-                    eval(['mh_smpl{i} = [mh_smpl{i};tmp_dat.mh_smpl_',num2str(j),'];']);
-                    eval(['mh_value{i} = [mh_value{i};tmp_dat.mh_value_',num2str(j),'];']);
-                catch
-                end
+ 
+                eval(['mh_smpl{i} = [mh_smpl{i};tmp_dat.mh_smpl_',num2str(j),'];']);
+                eval(['mh_value{i} = [mh_value{i};tmp_dat.mh_value_',num2str(j),'];']);
+
             end
             figure(10)
             subplot(4,5,i) %plot the LL histograms per chain
@@ -1080,8 +1080,7 @@ if strcmp(paper_fig_num,'sup7')
             plot(C(floor(length(C)/2):end));           
             set(gca,'xlim',[0,10000],'ylim',[-0.1 1])
           
-        catch
-        end
+
         %     figure(1+i)
     %     for j = 1:5
     %         subplot(2,3,j); histogram(mh_smpl{i}(:,j));
@@ -1090,7 +1089,7 @@ if strcmp(paper_fig_num,'sup7')
         mh_val_all = [mh_val_all; mh_value{i}]; 
     end
 
-
+    size(SPS)
     mh_vals = mh_val_all;
     sz = 2*(1+max(mh_vals)-mh_vals);
     figure(1)
@@ -1873,6 +1872,8 @@ if strcmp(paper_fig_num, 'sup8b')
     return
 
 end
+
+
 
 
 
