@@ -1,5 +1,5 @@
 
-![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)
+![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg) [![DOI](https://zenodo.org/badge/252526396.svg)](https://zenodo.org/badge/latestdoi/252526396)
 
 ### Matlab Codes for Forero2020
 -----
