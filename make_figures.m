@@ -139,7 +139,7 @@ if strcmp(paper_fig_num,'3a')
     minvec = sigred(1,:);
     maxvec = sigred(1,:);   %randomly sample 1000 mh par lines to generate gray lines
     rng(0)
-    for i=1:1000  % Sample for gray fill
+    for i=1:1000  % Sample MCMC for gray fill
         n = ceil(rand*size(mh_pars,1));
 
 
@@ -202,7 +202,7 @@ if strcmp(paper_fig_num,'3a')
     minvec = sigred(pt,:);
     maxvec = sigred(pt,:);
     rng(0)
-    for i=1:1000   %sample and get min / max from 100 random mh signals
+    for i=1:1000   %sample and get min / max from 1000 random mcmc signals
         n = ceil(rand*size(mh_pars,1));
 
         parameters_samp(par_changed) = par_samp;
@@ -211,7 +211,7 @@ if strcmp(paper_fig_num,'3a')
         [sigred_samp,TT_samp,means_samp,sig_samp,TT2_samp,mins_samp] = get_ac_and_cc_mod_simplified(parameters_samp,[0:.1:30]);   
         %plot(TT_samp, sigred_samp(5,:),'-','Color',[.8,.8,.8],'linewidth',2)
 
-        for j = 1:length(sigred_samp)
+        for j = 1:length(sigred_samp)  %store the minimum and maximum points for grayfill
             if sigred_samp(pt,j) > maxvec(1,j)
                 maxvec(1,j) = sigred_samp(pt,j);
 
@@ -318,7 +318,7 @@ if strcmp(paper_fig_num,'3a')
     maxvec = [sigred(4,end:-1:2),sigred(2,:)];
     rng(0)
 
-    for i=1:1000
+    for i=1:1000  %sample the MCMC for gray fill
         n = ceil(rand*size(mh_pars,1));
 
         parameters_samp(par_changed) = par_samp;
@@ -340,7 +340,7 @@ if strcmp(paper_fig_num,'3a')
         end
     end
 
-    fill([[-TT(end:-1:2);TT]',fliplr([-TT(end:-1:2);TT]')], [minvec, fliplr(maxvec)],[.8,.8,.8], 'EdgeColor', [.8,.8,.8]);
+    fill([[-TT(end:-1:2);TT]',fliplr([-TT(end:-1:2);TT]')], [minvec, fliplr(maxvec)],[.8,.8,.8], 'EdgeColor', [.8,.8,.8]); %fill in gray
 
     b1=errorbar(lags2, ser5_rnap.mn_cc, ser5_rnap.sem_cc,'s','MarkerSize',5,'MarkerFaceColor',[0, 0.67, 1],'Color',[0, 0.67, 1]);hold on;
 
@@ -540,12 +540,12 @@ if strcmp(paper_fig_num,'3a')
 
     %%
 
-    thresh = .2;
+    thresh = .2;  %count the dwell time as when the autocorrelation crosses 20% decorrelation
     t = [0:1:199];
     mrna_bootstrapped_tau = [];
     ser5_bootstrapped_tau = [];
     rnap_bootstrapped_tau = [];
-    for i = 1:400
+    for i = 1:400   %get the decorrelation times
        tmpacov = t(mrna_sim_acov(i,:) < thresh);
 
        mrna_bootstrapped_tau = [mrna_bootstrapped_tau, tmpacov(1)];
@@ -800,19 +800,21 @@ if strcmp(paper_fig_num,'sup8a')
 
     pol2_ssa = (sol(2,:) + sol(3,:))'; %pol2 is in all channels
     ser5_ssa = (sol(2,:)+ sol(3,:))';
-    ts_ssa = sol(3,:)';
+    ts_ssa = sol(3,:)';  %mRNA is only in state 3
 
 
     bubble_top = pol2_ssa(end-500:end);  %get top and bottom for red fill
-    bubble_bottom = ts_ssa(end-500:end);
+    bubble_bottom = ts_ssa(end-500:end); 
 
     p2 = pol2_ssa(end-500:end)-ts_ssa(end-500:end);
     on = (p2 > 5);
+    
+    %fill between the top and bottom
     fill([T_array(1:501),fliplr(T_array(1:501))], [(on*500)'-500, fliplr((on*500)')],[220,220,220]./256,'linestyle','None','HandleVisibility','off' )
     hold on;
     fill([T_array(1:501),fliplr(T_array(1:501))], [bubble_top', fliplr(bubble_bottom')], [255, 212, 212]./256, 'linestyle','None')
 
-
+    % SSA
     plot(T_array(1:501),pol2_ssa(end-500:end),'r','linewidth',2); hold on;  plot(T_array(1:501),ts_ssa(end-500:end),'b','linewidth',2 )
 
     ylim([0,150])
@@ -888,17 +890,17 @@ if strcmp(paper_fig_num, '3d')
     ser5_c = [];
     mrna_c = [];
     for i = 1:1000
-        sol = run_single_SSA(x0,S,W,[0:1:2000],time_var,signal_update_rate);
-        pol2_ssa = sol(2,:)';
+        sol = run_single_SSA(x0,S,W,[0:1:2000],time_var,signal_update_rate); % solve the SSA
+        pol2_ssa = sol(2,:)'; %these are unused
         ser5_ssa = sol(2,:)';
-        ts_ssa = sol(3,:)';
+        ts_ssa = sol(3,:)';  %get just the mRNA traj
         mrnai = ts_ssa;
 
-        [pol2_ssa,ser5_ssa,ts_ssa,~] = get_model_intesities(sol,eta_rnap,eta_ser5,eta_ts);   
+        [pol2_ssa,ser5_ssa,ts_ssa,~] = get_model_intesities(sol,eta_rnap,eta_ser5,eta_ts); %generate the pol2_ssa/ser5_ssa
         [pol2norm,ser5norm,tsnorm] = Normalize_simulated_intensities(.95,pol2_ssa,ser5_ssa,ts_ssa);
 
 
-        pol2_ssa_traj = [pol2_ssa_traj, pol2norm(1:200:end)];
+        pol2_ssa_traj = [pol2_ssa_traj, pol2norm(1:200:end)]; %append the signals
         ser5_ssa_traj = [ser5_ssa_traj, ser5norm(1:200:end)];
         ts_ssa_traj = [ts_ssa_traj, ts_ssa(1:200:end)];
         mrnai_traj = [mrnai_traj, mrnai(1:200:end)];
@@ -906,7 +908,7 @@ if strcmp(paper_fig_num, '3d')
     end
 
 
-    pol2_traj = pol2_ssa_traj';
+    pol2_traj = pol2_ssa_traj'; %transpose to plot
     ser5_traj = ser5_ssa_traj';
     ts_traj = ts_ssa_traj';
 
@@ -1080,7 +1082,7 @@ if strcmp(paper_fig_num,'sup7')
         mh_val_all = [mh_val_all; mh_value{i}]; 
     end
 
-    size(SPS)
+    size(SPS);
     mh_vals = mh_val_all;
     sz = 2*(1+max(mh_vals)-mh_vals);
     figure(1)
@@ -1325,7 +1327,7 @@ if strcmp(paper_fig_num, 'sup10')
     time_var = 0;
     signal_update_rate = 0;
 
-    W = @(x) W1*x + W0;
+    W = @(x) W1*x + W0; %propensity function
     n = 0;
     rng(20) %set the seed
     figure(1)
