@@ -1147,7 +1147,7 @@ if strcmp(paper_fig_num,'sup7')
        end
 
     end
-       subplot(5,5,2)
+       subplot(5,5,2)  % add extra plot for colorbar
        scatter(mh_par_sort(1:100:end,1),mh_par_sort(1:100:end,2),sz(1:100:end),mh_val_new(1:100:end),'filled','MarkerFaceAlpha',.2,'MarkerEdgeAlpha',.2); hold on
 
 
@@ -1159,6 +1159,7 @@ if strcmp(paper_fig_num,'sup7')
     end
 
     %% table of derived parameters with 95% confidence interval
+    % this prints out the 95% CI for all these parameters
  
     highv = 97.5/100;
     lowv = 2.5/100;
@@ -1302,14 +1303,14 @@ if strcmp(paper_fig_num, 'sup10')
     b(1) = kon;
 
     c = zeros(3,3);
-    c(1,1:3)=[0,1,1];
+    c(1,1:3)=[0,1,1];  %signal matrix
     c(2,1:3)=[0,frac,1];
     c(3,3)=1;
 
     S = zeros(3,6);
     W1 = zeros(6,3);
     W0 = zeros(6,1);
-    S(1,1) = 1;  W1(1,1) = -kon; W0(1,1) = kon;
+    S(1,1) = 1;  W1(1,1) = -kon; W0(1,1) = kon;  %set up stoich and prop
     S(1,2) = -1; W1(2,1) = koff; 
 
     S(2,3) = 1; W1(3,1) = kin; 
@@ -1319,14 +1320,14 @@ if strcmp(paper_fig_num, 'sup10')
     S(3,6) = -1; W1(6,3) = kproc; 
 
 
-    x0 = [0,0,0]';
-    T_array = [0:1:1000];
+    x0 = [0,0,0]';  %inital condition
+    T_array = [0:1:1000]; %time vector
     time_var = 0;
     signal_update_rate = 0;
 
     W = @(x) W1*x + W0;
     n = 0;
-    rng(20)
+    rng(20) %set the seed
     figure(1)
     titles = {'Blocking k_{on}','Blocking k_{escape}','Blocking k_{esc} and 30% k_{proc}','Blocking k_{on} and 30% k_{proc} '};
         fig1= gcf;
@@ -1340,7 +1341,7 @@ if strcmp(paper_fig_num, 'sup10')
 
     inhibs = ones(size(parameters));
     k = k+1;
-    switch k
+    switch k    %inhibition conditions, which parameters to change for each plot
         case 1  %inhibit kon
             inhibs(1) = .000001;
 
@@ -1411,7 +1412,7 @@ if strcmp(paper_fig_num, 'sup10')
     b(3) = 0;
 
     c = zeros(3,3);
-    c(1,1:3)=[0,1,1];
+    c(1,1:3)=[0,1,1];   %repeat all this to set up the ODE
     c(2,1:3)=[0,frac,1];
     c(3,3)=1;
 
@@ -1711,7 +1712,7 @@ if strcmp(paper_fig_num, 'sup8b')
     ylabel('Molecule counts')
     hold on;
 
-    text(1-.2,30,string(round(X2(1),1)),'FontSize',fntsize-4,'FontWeight','bold') 
+    text(1-.2,30,string(round(X2(1),1)),'FontSize',fntsize-4,'FontWeight','bold') % add labels
     text(8-.2,30,string(round(X2(8),1)),'FontSize',fntsize-4,'FontWeight','bold') 
     n = length(npts_pol2);
     title(strcat('Average On (Total CTD > 50) nsim = ',string(n)),'FontSize',fntsize,'FontWeight','bold')
@@ -1722,7 +1723,7 @@ if strcmp(paper_fig_num, 'sup8b')
     saveas(gca,'./Figures/bursting_chip.epsc')
     end
 
-    %%
+    %% record chip 
     
     rng(0)
     npts_pol2 = [];
@@ -1736,9 +1737,9 @@ if strcmp(paper_fig_num, 'sup8b')
 
     %while length(npts) < 2000
 
-    for j = 1:3
+    for j = 1:3 % For some really long trajectories, record decorrelated points for the CHIP
         T_array = [0:1:40000];
-        sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
+        sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate); % Run the SSA
 
         pol2_ssa = sol(2,:)';
         ser5_ssa = sol(2,:)+ sol(3,:)';
@@ -1756,7 +1757,7 @@ if strcmp(paper_fig_num, 'sup8b')
         end
     end
 
-    time_elongating = 5.2/4.1;     
+    time_elongating = 5.2/4.1;  %assume speed of 4.1 kb/min   
     residence = 1/kproc;
     time_processing = residence - time_elongating;
 
@@ -1785,7 +1786,7 @@ if strcmp(paper_fig_num, 'sup8b')
     saveas(gca,'./Figures/off_chip.epsc')
     end
 
-    %%
+    %% Record points in transient states, not bursting but not off
    
     rng(0)
     npts_pol2 = [];

@@ -1434,16 +1434,6 @@ if strcmp(paper_fig_num, 'sup10')
     ctd_ode = [];
     ts_ode = [];
     for j = 1:length(tode)   
-
-        %P = expm(A*tode(j)+ W0)*b;
-    %      if j == 1
-    %          b(2) = means(2);
-    %          b(3) = means(3);
-    %      else
-    %          b(2) = 0;
-    %          b(3) = 0;         
-    %      end
-
          EX = -A\b;
          means_new = c*EX;
          %P =  A^-1*(-eye(3) + expm(A*tode(j)))*b - x0;
@@ -1549,6 +1539,7 @@ if strcmp(paper_fig_num, 'sup8b')
     % Do the simulated chip experiments for sup fig 8
     % WARNING THIS TAKES A LOT OF MEMORY
     
+    
     rng(0)
     kon = parameters(1);
     koff = 1000;%parameters(2);
@@ -1575,11 +1566,11 @@ if strcmp(paper_fig_num, 'sup8b')
     b(1) = kon;
 
     c = zeros(3,3);
-    c(1,1:3)=[0,1,1];
+    c(1,1:3)=[0,1,1];  %signal matrix
     c(2,1:3)=[0,frac,1];
     c(3,3)=1;
 
-    S = zeros(3,6);
+    S = zeros(3,6);  %propensity and stoich
     W1 = zeros(6,3);
     W0 = zeros(6,1);
     S(1,1) = 1;  W1(1,1) = -kon; W0(1,1) = kon;
@@ -1597,14 +1588,14 @@ if strcmp(paper_fig_num, 'sup8b')
     time_var = 0;
     signal_update_rate = 0;
 
-    W = @(x) W1*x + W0;
-    %while length(npts) < 2000
+    W = @(x) W1*x + W0;   %porpensity fun
+  
 
-    pol2_on = [];
+    pol2_on = [];  %setup vectors to record
     pol2_off = [];
     pol2_transient = [];
 
-    for j = 1:3
+    for j = 1:3  %record points for a long period of time decorrelated for the ChIP
         T_array = [0:1:40000];
         sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
 
@@ -1660,7 +1651,7 @@ if strcmp(paper_fig_num, 'sup8b')
 
     %end
 
-    %%
+    %% record chip when bursting
    
     rng(0)
     npts_pol2 = [];
@@ -1673,7 +1664,7 @@ if strcmp(paper_fig_num, 'sup8b')
     fig1.PaperPosition = [0, 0, 1*xh, yh]; % x,y, width, height
 
     %while length(npts) < 2000
-    while length(npts_ts) < 500 %wait until we collect enough timepoints in a transient condition
+    while length(npts_ts) < 500 %wait until we collect enough timepoints in a bursting (on) condition
         length(npts_ts) 
         T_array = [0:1:40000];
         sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
@@ -1712,7 +1703,7 @@ if strcmp(paper_fig_num, 'sup8b')
     ylabel('Molecule counts')
     hold on;
 
-    text(1-.2,30,string(round(X2(1),1)),'FontSize',fntsize-4,'FontWeight','bold') 
+    text(1-.2,30,string(round(X2(1),1)),'FontSize',fntsize-4,'FontWeight','bold') % add labels
     text(8-.2,30,string(round(X2(8),1)),'FontSize',fntsize-4,'FontWeight','bold') 
     n = length(npts_pol2);
     title(strcat('Average On (Total CTD > 50) nsim = ',string(n)),'FontSize',fntsize,'FontWeight','bold')
@@ -1723,7 +1714,7 @@ if strcmp(paper_fig_num, 'sup8b')
     saveas(gca,'./Figures/bursting_chip.epsc')
     end
 
-    %%
+    %% record chip when transcript is in an off state
     
     rng(0)
     npts_pol2 = [];
@@ -1737,9 +1728,9 @@ if strcmp(paper_fig_num, 'sup8b')
 
     %while length(npts) < 2000
 
-    for j = 1:3
+    for j = 1:3 % For some really long trajectories, record decorrelated points for the CHIP
         T_array = [0:1:40000];
-        sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate);
+        sol = run_single_SSA(x0,S,W,T_array,time_var,signal_update_rate); % Run the SSA
 
         pol2_ssa = sol(2,:)';
         ser5_ssa = sol(2,:)+ sol(3,:)';
@@ -1757,7 +1748,7 @@ if strcmp(paper_fig_num, 'sup8b')
         end
     end
 
-    time_elongating = 5.2/4.1;     
+    time_elongating = 5.2/4.1;  %assume speed of 4.1 kb/min   
     residence = 1/kproc;
     time_processing = residence - time_elongating;
 
@@ -1786,7 +1777,7 @@ if strcmp(paper_fig_num, 'sup8b')
     saveas(gca,'./Figures/off_chip.epsc')
     end
 
-    %%
+    %% Record points in transient states, not bursting but not off
    
     rng(0)
     npts_pol2 = [];
