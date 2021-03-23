@@ -95,37 +95,6 @@ legend('Chosen','Phosphorylation','mRNA retention','Fractional','two state')
 title('CTD')
 
 %%
-
-% lags1 = [0:31]; 
-% fntsize = 18;   %set up figure 3
-% 
-% 
-% subplot(3,3,1)
-% fig1= gcf;
-% %set(gcf,'color','k');
-% fig1.PaperUnits = 'centimeters';
-% xh = 2*3*6;
-% yh = 2*14.3/3;
-% fig1.PaperPosition = [0, 0, 2/3*xh, 2*yh]; % x,y, width, height
-% %sem_rnap = std(Xdata_sem(:,1:30),1)/(sqrt(20));
-% 
-% plot(TT, sigred(1,:),'g-','linewidth',6)  %plot model rnap_acc
-% hold on;
-% plot(TT, sigred_cs(1,:),'b-','linewidth',4)  %plot model rnap_acc
-% plot(TT, sigred_ms(1,:),'-','linewidth',2, 'Color', [242, 180,7]./256)  %plot model rnap_acc
-% plot(TT, sigred_frac(1,:),'y-','linewidth',1)  %plot model rnap_acc
-% 
-% %plot(TT, sigred_2s(1,:),'m-','linewidth',1)  %plot model rnap_acc
-% 
-% %plot the data rnap_acc
-% b1=errorbar(lags1(1:25), rnap.mn_ac(1:25), rnap.sem_ac(1:25),'o','MarkerSize',5,'MarkerFaceColor',[0, 0, 0]./256,'Color',[0, 0, 0]./256);hold on;
-% ylim([.3852,.3856])
-% xlim([3.7016,3.702])
-% legend('simple','ctd>ser5','mrna solo','two state')
-% 
-
-
-%%
 subplot(3,2,3)      %SER5 ACC figure
 fig1= gcf;
 fig1.PaperUnits = 'centimeters';

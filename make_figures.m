@@ -915,8 +915,7 @@ if strcmp(paper_fig_num, '3d')
     ser5_data = reshape(ser5_I(1:20:end,:),1,200);
     mrna_data = reshape(mrna_I(1:20:end,:),1,200);
 
-    %xh = 6.3;
-    %yh = 6.4;
+
 
     fntsize = 18;
 
@@ -927,8 +926,8 @@ if strcmp(paper_fig_num, '3d')
     fig1.PaperPosition = [0, 0,xh/3, 3*yh/3]; % x,y, width, height
 
     [x,n] = hist(reshape(pol2_traj.',1,[]),30);
-    [11, 252, 3]./256
-    [218, 51, 255]./256
+    [11, 252, 3]./256;
+    [218, 51, 255]./256;
     x1 = histogram(reshape(pol2_traj.',1,[]),n,'Normalization','probability','FaceColor',[11, 252, 3]./256,'FaceAlpha',.2,'linewidth',.01,'edgecolor',[11, 252, 3]./256)%,'DisplayStyle','stairs')
     hold on;
     x2 = histogram(reshape(pol2_traj.',1,[]),n,'Normalization','probability','FaceColor','none','FaceAlpha',.2,'linewidth',3,'edgecolor',[11, 252, 3]./256,'DisplayStyle','stairs')
@@ -1124,26 +1123,14 @@ if strcmp(paper_fig_num,'sup7')
         elseif i==Np
             xlabel({parnames{par_changed(i)}},'FontSize',fntsize,'FontWeight','bold');
         end
-        %     hold on
-        %     pr = max(0,log(H.BinEdges/100));
-        %     switch parnames{par_changed(i)}
-        %         case 'kproc'
-        %             pr = pr + log(H.BinEdges/(1/(103/60)));
-        %         case 'ke'
-        %             pr = pr + log(H.BinEdges/4.1);
-        %     end
 
-        %     [qw,qe] =max(H.Values);
-
-        %     pr = max(H.Values)*exp(-pr)/exp(-pr(qe));
-        %     plot(H.BinEdges,pr,'r','linewidth',2)
 
             set (gca ,'TickLength',[.01,.3],'LineWidth',2);
         set (gca ,'FontSize',fntsize,'FontName', 'Arial');
 
 
-       for j=i+1:Np
-            subplot(Np,Np,(j-1)*Np+i)
+       for j=i+1:Np  % Plot the scatter plot along the lower diagonal
+            subplot(Np,Np,(j-1)*Np+i)  %scatter with colors based on LL, thin by 100
              scatter(mh_par_sort(1:100:end,i),mh_par_sort(1:100:end,j),sz(1:100:end),mh_val_new(1:100:end),'filled','MarkerFaceAlpha',.2,'MarkerEdgeAlpha',.2); hold on
 
             plot(mh_pars(1,i),mh_pars(1,j),'ko','markersize',8,'markerfacecolor','k')
@@ -1160,7 +1147,7 @@ if strcmp(paper_fig_num,'sup7')
        end
 
     end
-       subplot(5,5,2)
+       subplot(5,5,2)  % add extra plot for colorbar
        scatter(mh_par_sort(1:100:end,1),mh_par_sort(1:100:end,2),sz(1:100:end),mh_val_new(1:100:end),'filled','MarkerFaceAlpha',.2,'MarkerEdgeAlpha',.2); hold on
 
 
@@ -1172,6 +1159,7 @@ if strcmp(paper_fig_num,'sup7')
     end
 
     %% table of derived parameters with 95% confidence interval
+    % this prints out the 95% CI for all these parameters
  
     highv = 97.5/100;
     lowv = 2.5/100;
@@ -1315,14 +1303,14 @@ if strcmp(paper_fig_num, 'sup10')
     b(1) = kon;
 
     c = zeros(3,3);
-    c(1,1:3)=[0,1,1];
+    c(1,1:3)=[0,1,1];  %signal matrix
     c(2,1:3)=[0,frac,1];
     c(3,3)=1;
 
     S = zeros(3,6);
     W1 = zeros(6,3);
     W0 = zeros(6,1);
-    S(1,1) = 1;  W1(1,1) = -kon; W0(1,1) = kon;
+    S(1,1) = 1;  W1(1,1) = -kon; W0(1,1) = kon;  %set up stoich and prop
     S(1,2) = -1; W1(2,1) = koff; 
 
     S(2,3) = 1; W1(3,1) = kin; 
@@ -1332,14 +1320,14 @@ if strcmp(paper_fig_num, 'sup10')
     S(3,6) = -1; W1(6,3) = kproc; 
 
 
-    x0 = [0,0,0]';
-    T_array = [0:1:1000];
+    x0 = [0,0,0]';  %inital condition
+    T_array = [0:1:1000]; %time vector
     time_var = 0;
     signal_update_rate = 0;
 
     W = @(x) W1*x + W0;
     n = 0;
-    rng(20)
+    rng(20) %set the seed
     figure(1)
     titles = {'Blocking k_{on}','Blocking k_{escape}','Blocking k_{esc} and 30% k_{proc}','Blocking k_{on} and 30% k_{proc} '};
         fig1= gcf;
@@ -1353,7 +1341,7 @@ if strcmp(paper_fig_num, 'sup10')
 
     inhibs = ones(size(parameters));
     k = k+1;
-    switch k
+    switch k    %inhibition conditions, which parameters to change for each plot
         case 1  %inhibit kon
             inhibs(1) = .000001;
 
@@ -1424,7 +1412,7 @@ if strcmp(paper_fig_num, 'sup10')
     b(3) = 0;
 
     c = zeros(3,3);
-    c(1,1:3)=[0,1,1];
+    c(1,1:3)=[0,1,1];   %repeat all this to set up the ODE
     c(2,1:3)=[0,frac,1];
     c(3,3)=1;
 
