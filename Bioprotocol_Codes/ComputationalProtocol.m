@@ -141,9 +141,9 @@ time_vec = [0:30]; % Time span to solve over (minutes)
 cc_range = 15; % cross correlation delay times to include in the log likelihood calculation
 acc_range = 20; % auto correlation delay times to include in the log likelihood calculation
 channels_quantified = [3]; % which channel was quantified for spot counts? in our case 3 for mRNA
-DataMeans = [0,0,15.5]; % Data means for spot counts, 0 if not quantified
-DataSEMs = [0,0,.93];   % SEM of the spots quantified, 0 if not quantified
-Nspots = [0,0,130];     % Number of spots quantified, 0 if not quantified
+DataMeans = [0,0,15.5]; % Data means for molecule counts, 0 if not quantified
+DataSEMs = [0,0,.93];   % SEM of the molecule quantified, 0 if not quantified
+Nmolecules = [0,0,130];     % Number of molecule quantified at the TS, 0 if not quantified
 
 
 par_fixed = parameters; % Which parameters are fixed
@@ -152,9 +152,9 @@ par_changed = [1,3:6,8:13]; %which parameters are free to change
 [ModelLikelihood] = get_log_likelihood(parameters(par_changed), NormalizedCorrelationData, DataMeans, ...
                                        DataSEMs, S, W1, W0, c, ...
                                        noise_parameters, time_vec, cc_range, acc_range, ...
-                                       channels_quantified, Nspots, ChannelNames, par_fixed, par_changed);
+                                       channels_quantified, Nmolecules, ChannelNames, par_fixed, par_changed);
         
-ModelLikelihoodTotal = sum(ModelLikelihood)
+ModelLikelihoodTotal = sum(ModelLikelihood);
 % After running this with the default parameters, the total negative log likelihood of
 % the data given the model should be 14.558.
 
@@ -174,7 +174,7 @@ Constraints.UB=5*ones(size(par_changed));
 get_LL = @(parameters) sum(get_log_likelihood(10.^parameters, NormalizedCorrelationData, DataMeans, ...
                                        DataSEMs, S, W1, W0, c, ...
                                        noise_parameters, time_vec, cc_range, acc_range, ...
-                                       channels_quantified, Nspots, ChannelNames, par_fixed, par_changed));
+                                       channels_quantified, Ntranscripts, ChannelNames, par_fixed, par_changed));
 
 
 [ParBest,MLE] = get_MLE(get_LL, parameters, par_changed, search_chains, Constraints, GA_pop, save_file_name);
