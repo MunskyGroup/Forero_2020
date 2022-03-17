@@ -25,6 +25,7 @@ clc
 clear 
 close all
 
+addpath('./Functions','-end')
 %% Section 1 - Load an Normalize Trajectory Data, and Calculate Normalized Correlation Functions
 %  Bio-Protocol Section E
 
