@@ -99,10 +99,10 @@ function err = get_log_likelihood(pars, NormalizedCorrelationData, DataMeans, Da
     var_dat = DataSEMs(channels_quantified).^2.*Nspots(channels_quantified);
     
     %Error for model / data means for channels quantified
-    err(k+1) = sum((ModelMeans(channels_quantified) - mean_dat)^.2 ./ var_dat.^2 ./ 2);
+    err(k) = sum((ModelMeans(channels_quantified) - mean_dat)^.2 ./ var_dat.^2 ./ 2);
     
     % match variance in number of mRNA
-    err(k+2) = sum((diag(ModelVariances(channels_quantified,channels_quantified)) - var_dat).^2 ./ 10^2 ./2);
+    err(k+1) = sum((diag(ModelVariances(channels_quantified,channels_quantified)) - var_dat).^2 ./ 10^2 ./2);
     
     
     %% Optional priors here if needed
