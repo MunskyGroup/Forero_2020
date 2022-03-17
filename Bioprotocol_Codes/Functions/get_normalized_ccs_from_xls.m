@@ -107,8 +107,11 @@ end
 if RezeroAutoCorrelation == true
     for i = 1:NChannels
         cc = CorrelationData.(strcat(ChannelNames{i}, '_', ChannelNames{i})).mean_corr;
+        sem = CorrelationData.(strcat(ChannelNames{i}, '_', ChannelNames{i})).sem_corr;
         rezero_value = mean(cc(end-RezeroPoints:end));
         scale_factor = cc(1)/(cc(1)-rezero_value);
         CorrelationData.(strcat(ChannelNames{i}, '_', ChannelNames{i})).mean_corr = (cc-rezero_value)*scale_factor;
+        CorrelationData.(strcat(ChannelNames{i}, '_', ChannelNames{i})).sem_corr =  sem*scale_factor;
+
     end
 end
