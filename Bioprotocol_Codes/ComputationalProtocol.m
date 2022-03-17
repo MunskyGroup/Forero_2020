@@ -174,7 +174,7 @@ Constraints.UB=5*ones(size(par_changed));
 get_LL = @(parameters) sum(get_log_likelihood(10.^parameters, NormalizedCorrelationData, DataMeans, ...
                                        DataSEMs, S, W1, W0, c, ...
                                        noise_parameters, time_vec, cc_range, acc_range, ...
-                                       channels_quantified, Ntranscripts, ChannelNames, par_fixed, par_changed));
+                                       channels_quantified, Nspots, ChannelNames, par_fixed, par_changed));
 
 
 [ParBest,MLE] = get_MLE(get_LL, parameters, par_changed, search_chains, Constraints, GA_pop, save_file_name);
@@ -193,7 +193,7 @@ get_LL = @(parameters) sum(get_log_likelihood(10.^parameters, NormalizedCorrelat
 % User Defined Parameters
 k = 5; % Number of parameters
 n = 8; % Observed datapoints or independent data sets (6 correlations + 2 moments of spots)
-
+Nspots
 BIC = k*log(n) - 2*-MLE; %Bayes information criterion
 AIC = k - 2*-MLE; % Akaike information criterion
 
