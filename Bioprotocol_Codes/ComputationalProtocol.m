@@ -75,6 +75,25 @@ VarianceSpotCount = .93;       % Variance in number of nascent mRNA per transcri
 % After running this section, IntensityData contains the intensity
 % fluctuation data and NormalizedCorrelationData contains the calculated
 % correlation functions.
+
+% Example normalized TS trace
+figure();
+n = 1;
+plot(IntensityData.CTD.normalized_data(:,n),'r','LineWidth',2); hold on;
+plot(IntensityData.Ser5ph.normalized_data(:,n),'g','LineWidth',2);
+plot(IntensityData.mRNA.normalized_data(:,n),'b','LineWidth',2);
+legend('CTD','Ser5ph','mRNA')
+title('Example Normalized Intensity Trace')
+
+% Plot the mean correlations after normalization
+figure();
+plot(NormalizedCorrelationData.Ser5ph_CTD.mean_corr,'r','LineWidth',3); hold on;
+plot(NormalizedCorrelationData.mRNA_CTD.mean_corr,'g','LineWidth',3);
+plot(NormalizedCorrelationData.mRNA_Ser5ph.mean_corr,'b','LineWidth',3);
+plot([11,11],[0,1.2],'k--')
+legend('Ser5ph-CTD','mRNA-CTD','mRNA-Ser5ph')
+title('Mean Normalized Cross Correlations')
+
                                                     
 %% Section 2 - Model Specification
 % Specify the model here, see Forero 2020 methods section.
