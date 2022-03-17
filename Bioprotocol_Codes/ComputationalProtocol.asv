@@ -84,12 +84,12 @@ Nstates = 3;  % Number of species in the model
 
 % Identified parameters for the final model.
 parameters = [  0.433596648003337, ... % kon 1/min = omega
-                1000, ...              % koff 1/min = fixed at 1000 for instantaneous bursts
+                1000, ...              % koff 1/min = fixed at 1000
                 0.666624850282066, ... % kesc 1/min
                 0.198727194675144, ... % kproc 1/min
-                15.4054402060124, ...  % burst size, b
+                15.4054402060124, ...  % burst size
                 0.777851806420281, ... % kout 1/min
-                1, ...                 % (frac)tion of RNAP2 in State 2 that are Ser5ph labeled. Fixed at 1.
+                1, ...                 % (frac)tion of RNAP2 in State 2 that are Ser5ph labeled
                 1.98448561566709, ...  % eta_rnap
                 1.42073542241570, ...  % eta_ser5
                 0.408137598525255, ... % eta_ts
@@ -107,12 +107,12 @@ S =  [[1    -1     0     0     0     0];
       [0     0     0     0     1    -1]];   
 
 % propensity functions have the affine linear form W = W1*x + W0
-W1 = @(p)[[-p(1)      0         0];
+W1 = @(p)[[-p(1)           0         0];
           [p(2)       0         0];
-          [p(5)*p(2)  0         0];
-          [    0      p(6)      0];
-          [    0      p(7)*p(3) 0];
-          [    0      0         p(4)];];   
+          [p(5)*p(2)       0         0];
+          [    0           p(6)      0];
+          [    0           p(7)*p(3) 0];
+          [    0          0          p(4)];];   
 
 % independent of x
 W0 = @(p)[[p(1); 0; 0; 0; 0; 0;]];
@@ -129,6 +129,7 @@ noise_parameters = @(p)[p(8), p(9), p(10), p(11), p(12), p(13)];
 
 %% Section 3 - Function to solve model [a,b,c] = solve_model(S,w,pars)
 % Function that solves the defined model for Correlations, Means, and Variances
+
 
 time_vec = [0:30]; % Time span to solve over (minutes)
 [ModelCorrelations, ModelMeans, ModelVariances] = solve_model_from_mats(S, W1, W0, c, ...

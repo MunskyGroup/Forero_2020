@@ -1,4 +1,4 @@
-function err = get_log_likelihood(pars, NormalizedCorrelationData, DataMeans, DataSEMs, S, W1, W0, c, b, noise_parameters, time_vec, cc_range, acc_range, channels_quantified, Nspots, ChannelNames, par_fixed, par_changed)
+function err = get_log_likelihood(pars, NormalizedCorrelationData, DataMeans, DataSEMs, S, W1, W0, c, noise_parameters, time_vec, cc_range, acc_range, channels_quantified, Nspots, ChannelNames, par_fixed, par_changed)
 
     % Function that calculates the log likliehood from data correlation and a set of parameters
     % pars - full list of parameters
@@ -22,7 +22,7 @@ function err = get_log_likelihood(pars, NormalizedCorrelationData, DataMeans, Da
     parameters = par_fixed;
     parameters(par_changed) = pars;
     
-    [ModelCorrelations, ModelMeans, ModelVariances] = solve_model_from_mats(S, W1, W0, c, b, noise_parameters, time_vec, parameters);
+    [ModelCorrelations, ModelMeans, ModelVariances] = solve_model_from_mats(S, W1, W0, c, noise_parameters, time_vec, parameters);
     
     Nchannels = length(ChannelNames);
     acc_points = length(NormalizedCorrelationData.(strcat(ChannelNames{1},'_',ChannelNames{1})).mean_corr); 

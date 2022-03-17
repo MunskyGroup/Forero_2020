@@ -1,4 +1,4 @@
-function [ModelCorrelations, ModelMeans, ModelVariances] = solve_model_from_mats(S, W1, W0, c, b, noise_parameters, time_vec, parameters);
+function [ModelCorrelations, ModelMeans, ModelVariances] = solve_model_from_mats(S, W1, W0, c, noise_parameters, time_vec, parameters)
     
     % solve the models analytical correlations, means, and variances
 
@@ -8,12 +8,12 @@ function [ModelCorrelations, ModelMeans, ModelVariances] = solve_model_from_mats
     % W1 - Linear Propensity matrix(x)
     % W0 - Independent Propensity matrix [ kon 0 0 0 0 0 0 ] 1xN reactions
     % c - intensity transformation matrix, ie molecule to intensity matrix
-    % b - Independent Propensity matrix  = [ kon 0 0 ] = 1xNstates
     % noise_parameters - last Nchannel^2
     % time_vec - time vector of each sample
     % parameters - parameters to solve for
 
     % See Forero2020 Methods for full derivation
+    b = @(p)(S*W0(p));
     TT = time_vec;
     A =  S*W1(parameters);
     EX =  -A\b(parameters);
