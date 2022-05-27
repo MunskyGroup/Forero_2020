@@ -1,4 +1,4 @@
-function [PerturbationAnalyticalSolution] = solve_perturbed_analytical_solution(S, W1, W0, c, b, parameters, perturbation_vector)
+function [PerturbationAnalyticalSolution] = solve_perturbed_analytical_solution(S, W1, W0, c, parameters, perturbation_vector)
         
         % Function that solves analytical means solution 
 
@@ -13,11 +13,11 @@ function [PerturbationAnalyticalSolution] = solve_perturbed_analytical_solution(
         tmp_W1 = W1(parameters);
         tmp_W0 = W0(parameters);
 
-        W = @(x) tmp_W1*x + tmp_W0;
+        %W = @(x) tmp_W1*x + tmp_W0;
 
         tmp_W1_after = W1(parameters.*perturbation_vector);
 
-
+        b = @(x) S*W0(x);
         c_t = c(parameters);
 
         A=S*W1(parameters);  %get A matrix for dp/dt = Ap

@@ -212,7 +212,7 @@ get_LL = @(parameters) sum(get_log_likelihood(10.^parameters, NormalizedCorrelat
 % User Defined Parameters
 k = 5; % Number of parameters
 n = 8; % Observed datapoints or independent data sets (6 correlations + 2 moments of spots)
-Nspots
+
 BIC = k*log(n) - 2*-MLE; %Bayes information criterion
 AIC = k - 2*-MLE; % Akaike information criterion
 
@@ -224,8 +224,11 @@ proprnd = @(x)(x+delta.*randn(size(x)).*(randn(size(x))>0.5)); % Proposal functi
 parnames = {'kon','na','kesc','kproc','beta','kout','na','eta_ctd','eta_ser5','eta_mrna',...
     'sc_ctd','sc_ser5','sc_mrna'}; %Parameter names
 
+% THIS WILL TAKE A WHILE UNLESS YOU LOWER THE SAMPLES/CHAINS/SEGMENTS/THIN
+% Total evals = Nsamples * thin * nchains!!!
+
 nsamples = 5000; % n samples per chain
-nchains = 1; % n chains total
+nchains = 20; % n chains total
 nsegments = 20; % nsegments per chain
 thin = 20; % mh thinning rate
 save_file_name = 'met_hast_pars_example_'; %names of the mh chain files
@@ -248,7 +251,7 @@ plot_mh_from_files(parnames, save_file_name, nchains, nsegments, pars_to_plot, f
 
 %recalculate correlations with newly fit parameters.
 time_vec = [0:30]; 
-[ModelCorrelations, ModelMeans, ModelVariances] = solve_model_from_mats(S, W1, W0, c, b, ...
+[ModelCorrelations, ModelMeans, ModelVariances] = solve_model_from_mats(S, W1, W0, c, ...
                                                                         noise_parameters, time_vec, ParBest);
 
 plot_correlations(ModelCorrelations, NormalizedCorrelationData, ChannelNames)
@@ -272,7 +275,7 @@ zero_values = [30/200, 23/200,5/200]; % approximation of zero from real data for
                       number_trajectories);
 
 [IntensityTrajectories] = add_shot_noise(MoleculeTrajectories, parameters, noise_parameters, zero_values);
-[IntensityTrajectories] = normalize_simulated_trajectories(IntensityTrajectories, NChannels, ...
+[NormalizedIntensityTrajectories] = normalize_simulated_trajectories(IntensityTrajectories, NChannels, ...
                                                         ChannelNames, NormalizationQuantile, ...
                                                         MaxValue);
 
@@ -289,7 +292,7 @@ title('Example Simulated Intensity Trace')
 % User Defined parameters
 nbins = 30; %n number of bins for the histograms
 
-plot_histograms(IntensityTrajectories, IntensityData, ChannelNames, nbins)
+plot_histograms(NormalizedIntensityTrajectories, IntensityData, ChannelNames, nbins)
 
 %% Section 11 - Predict RNAP2 Locations (e.g, ChIP)
 % Simulate a ChIP experiment for the defined model for Nsites + 2 
@@ -300,6 +303,9 @@ plot_histograms(IntensityTrajectories, IntensityData, ChannelNames, nbins)
 % Returns: 1xN mean and 1xN std for RNAP at each ChIP site.
 
 % User Defined parameters
+
+kproc = parameters(4);
+
 time_vec = [0:600];
 number_samples = 100;  % number of times to run the simulated ChIP
 number_trajectories = 100; % number of TS sites per simulated ChIP
@@ -356,7 +362,7 @@ title('Example Simulated Intensity Trace w/ Perturbations')
 %analytical perturbation of moments with ODE solver
 
 [PerturbedAnalyticalSolution] = solve_perturbed_analytical_solution(S, W1, W0, ...
-                                                                     c, b, parameters, perturbation_vector);
+                                                                     c, parameters, perturbation_vector);
 figure()
 plot([0:.1:33], PerturbedAnalyticalSolution(1,:),'r','LineWidth',2); hold on;
 plot([0:.1:33],PerturbedAnalyticalSolution(2,:),'g--','LineWidth',2);
